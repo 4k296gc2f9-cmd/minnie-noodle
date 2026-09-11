@@ -1,0 +1,4529 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#FF6B35">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="ອາຫານຕາມສັ່ງ ສົດໃໝ່ທຸກຈານ ສົ່ງໄວ ຜ່ານ WhatsApp">
+<title id="pageTitle">ອາຫານຕາມສັ່ງ</title>
+<link rel="manifest" href="manifest.webmanifest">
+<!-- Performance: no render-blocking external font dependency. Local/system Lao fonts are used first. -->
+<style>
+/* ─── RESET & VARIABLES ─── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#FF6B35; --primary-d:#E85520; --primary-lt:#FFF3EC; --primary-med:#FFD6BF;
+  --green:#25D366;   --green-d:#1EB256;   --red:#FF4757;
+  --gold:#FFB300;    --gold-lt:#FFF8E1;   --purple:#8B5CF6;
+  --text:#1A1A2E;    --muted:#6B7280;     --border:#EDE8E3;
+  --bg:#FAF7F5;      --white:#FFFFFF;
+  --radius:18px; --radius-sm:12px; --radius-xs:8px;
+  --shadow:0 4px 24px rgba(255,107,53,.14);
+  --shadow-sm:0 2px 12px rgba(0,0,0,.07);
+  --shadow-md:0 8px 32px rgba(0,0,0,.10);
+  --shadow-lg:0 20px 60px rgba(0,0,0,.18);
+  --trans:.22s cubic-bezier(.4,0,.2,1);
+  --font:'Phetsarath OT','Noto Sans Lao',Arial,sans-serif;
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--font);background:var(--bg);min-height:100vh;color:var(--text);
+  padding-bottom:130px;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+
+/* ─── HEADER ─── */
+header{background:linear-gradient(145deg,#FF6B35 0%,#FF8F5E 55%,#FFB07A 100%);
+  color:#fff;padding:16px 16px 44px;position:relative;overflow:hidden}
+header::before,header::after{content:'';position:absolute;border-radius:50%;
+  background:rgba(255,255,255,.07);pointer-events:none}
+header::before{width:260px;height:260px;top:-90px;right:-70px}
+header::after {width:160px;height:160px;bottom:-60px;left:-40px}
+
+.header-top{display:flex;justify-content:space-between;align-items:center;
+  position:relative;z-index:1;margin-bottom:14px}
+.header-right{display:flex;align-items:center;gap:8px}
+
+.shop-status{display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.20);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.30);border-radius:100px;padding:6px 14px;
+  font-size:.78rem;font-weight:700;user-select:none}
+.status-dot{width:9px;height:9px;border-radius:50%;background:#4ade80;flex-shrink:0;
+  box-shadow:0 0 0 3px rgba(74,222,128,.35);animation:pulse 2s infinite}
+.status-dot.closed{background:#f87171;box-shadow:0 0 0 3px rgba(248,113,113,.35);animation:none}
+
+.lang-btn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.30);
+  border-radius:100px;padding:5px 11px;font-size:.72rem;font-weight:700;color:#fff;
+  cursor:pointer;font-family:var(--font);backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);transition:background var(--trans);
+  -webkit-tap-highlight-color:transparent}
+.lang-btn:hover{background:rgba(255,255,255,.28)}
+
+.header-clock{font-size:.72rem;opacity:.90;font-weight:700;text-align:right;line-height:1.55}
+
+.header-center{text-align:center;position:relative;z-index:1}
+.header-emoji{font-size:54px;display:block;line-height:1.1;margin-bottom:4px;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.18));animation:float 3.2s ease-in-out infinite}
+header h1{font-size:1.8rem;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,.18)}
+header .tagline{font-size:.82rem;opacity:.90;margin-top:5px;letter-spacing:.2px}
+
+.header-pills{display:flex;justify-content:center;gap:8px;margin-top:13px;flex-wrap:wrap}
+.h-pill{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.26);
+  border-radius:100px;padding:5px 12px;font-size:.71rem;font-weight:700;
+  display:flex;align-items:center;gap:4px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+
+.countdown-bar{background:rgba(0,0,0,.15);border-radius:var(--radius-xs);
+  padding:7px 14px;margin-top:12px;text-align:center;font-size:.76rem;font-weight:700;
+  display:none;align-items:center;justify-content:center;gap:8px}
+.countdown-bar.show{display:flex}
+.cd-time{font-size:1rem;letter-spacing:1.5px;font-weight:700}
+
+.header-wave{position:absolute;bottom:-1px;left:0;right:0;height:36px;
+  background:var(--bg);clip-path:ellipse(58% 100% at 50% 100%)}
+
+/* ─── CONTAINER ─── */
+.container{max-width:560px;margin:0 auto;padding:0 14px}
+
+/* ─── SECTION LABEL ─── */
+.slabel{display:flex;align-items:center;gap:8px;font-size:.7rem;font-weight:700;
+  letter-spacing:1.6px;text-transform:uppercase;color:var(--primary);margin:24px 0 11px}
+.slabel::after{content:'';flex:1;height:1.5px;
+  background:linear-gradient(to right,var(--border),transparent);border-radius:2px}
+
+/* ─── PWA INSTALL BANNER ─── */
+.install-banner{background:linear-gradient(135deg,var(--primary-lt),var(--gold-lt));
+  border:1.5px solid var(--primary-med);border-radius:var(--radius);
+  padding:13px 14px;display:none;align-items:center;gap:12px;
+  margin-top:18px;animation:fadeUp .4s ease}
+.install-banner.show{display:flex}
+.ib-icon{font-size:2rem;flex-shrink:0}
+.ib-text{flex:1;font-size:.8rem;font-weight:700;color:var(--text);line-height:1.4}
+.ib-sub{font-size:.7rem;color:var(--muted);font-weight:400;margin-top:2px}
+.ib-btn{background:var(--primary);color:#fff;border:none;padding:9px 14px;
+  border-radius:var(--radius-xs);font-family:var(--font);font-size:.78rem;
+  font-weight:700;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.ib-btn:active{transform:scale(.95)}
+
+/* ─── ORDER TYPE ─── */
+.otype-wrap{background:var(--white);border-radius:var(--radius);padding:5px;
+  display:flex;gap:4px;box-shadow:var(--shadow-sm)}
+.otype-btn{flex:1;padding:11px 6px;border:none;border-radius:var(--radius-sm);
+  font-family:var(--font);font-size:.8rem;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  color:var(--muted);background:transparent;
+  transition:background var(--trans),color var(--trans),box-shadow var(--trans);
+  -webkit-tap-highlight-color:transparent}
+.otype-btn.active{background:var(--primary);color:#fff;
+  box-shadow:0 4px 14px rgba(255,107,53,.3)}
+
+/* ─── FIELD CARDS ─── */
+.fields{display:flex;flex-direction:column;gap:10px}
+.field-card{background:var(--white);border-radius:var(--radius-sm);
+  box-shadow:var(--shadow-sm);padding:12px 14px;display:flex;align-items:center;
+  gap:10px;border:2px solid transparent;
+  transition:border-color var(--trans),box-shadow var(--trans)}
+.field-card:focus-within{border-color:var(--primary);box-shadow:var(--shadow)}
+.fc-icon{width:40px;height:40px;background:var(--primary-lt);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.field-card input{border:none;outline:none;font-size:.95rem;width:100%;
+  color:var(--text);background:transparent;font-family:var(--font)}
+.field-card input::placeholder{color:#C4CAD4}
+
+/* ─── CATEGORY TABS ─── */
+.cat-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  margin:0 -14px;padding:0 14px}
+.cat-scroll::-webkit-scrollbar{display:none}
+.cat-tabs{display:flex;gap:8px;width:max-content;padding-bottom:2px}
+.cat-tab{padding:8px 16px;border-radius:100px;border:1.5px solid var(--border);
+  background:var(--white);font-family:var(--font);font-size:.8rem;font-weight:700;
+  cursor:pointer;color:var(--muted);transition:all var(--trans);white-space:nowrap;
+  display:flex;align-items:center;gap:5px;box-shadow:var(--shadow-sm);
+  -webkit-tap-highlight-color:transparent}
+.cat-tab.active{background:var(--primary);border-color:var(--primary);color:#fff;
+  box-shadow:0 4px 14px rgba(255,107,53,.28)}
+
+/* ─── MENU CARDS ─── */
+.menu-list{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.menu-card{background:var(--white);border-radius:var(--radius);
+  box-shadow:var(--shadow-sm);border:2px solid transparent;overflow:hidden;
+  transition:border-color var(--trans),box-shadow var(--trans),transform var(--trans);
+  animation:fadeUp .38s ease both}
+.menu-card:nth-child(1){animation-delay:.04s} .menu-card:nth-child(2){animation-delay:.08s}
+.menu-card:nth-child(3){animation-delay:.12s} .menu-card:nth-child(4){animation-delay:.16s}
+.menu-card:nth-child(5){animation-delay:.20s}
+.menu-card.active{border-color:var(--primary);box-shadow:var(--shadow);transform:translateY(-2px)}
+
+.card-top{display:flex;align-items:center;gap:12px;padding:13px 14px 11px}
+.menu-img{width:72px;height:72px;border-radius:14px;background:var(--primary-lt);
+  display:flex;align-items:center;justify-content:center;font-size:34px;
+  flex-shrink:0;position:relative;overflow:hidden}
+.menu-img::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.16) 0%,transparent 60%)}
+
+.badge{position:absolute;top:-4px;right:-4px;font-size:.55rem;font-weight:700;
+  padding:2px 6px;border-radius:100px;white-space:nowrap;z-index:1;letter-spacing:.2px;color:#fff}
+.badge.hot {background:var(--red);   box-shadow:0 2px 6px rgba(255,71,87,.4)}
+.badge.best{background:var(--gold);  color:#7A5000; box-shadow:0 2px 6px rgba(255,179,0,.4)}
+.badge.new {background:var(--purple);box-shadow:0 2px 6px rgba(139,92,246,.4)}
+
+.menu-info{flex:1;min-width:0}
+.menu-name{font-size:.97rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.menu-desc{font-size:.73rem;color:var(--muted);line-height:1.4;margin-bottom:5px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.menu-price{font-size:.9rem;font-weight:700;color:var(--primary)}
+
+.qty-ctrl{display:flex;align-items:center;gap:3px;flex-shrink:0}
+.qty-btn{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);
+  background:var(--white);color:var(--text);font-size:1.1rem;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:background var(--trans),border-color var(--trans),color var(--trans),transform var(--trans);
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;line-height:1}
+.qty-btn:hover,.qty-btn:focus{background:var(--primary);border-color:var(--primary);color:#fff}
+.qty-btn.minus:hover,.qty-btn.minus:focus{background:#FFF0F0;border-color:var(--red);color:var(--red)}
+.qty-btn:active{transform:scale(.88)}
+.qty-disp{width:36px;text-align:center;font-size:1.05rem;font-weight:700;
+  color:var(--text);font-family:var(--font);user-select:none}
+
+.note-row{padding:0 14px 13px;display:none}
+.menu-card.active .note-row{display:block}
+.note-input{width:100%;border:1.5px solid var(--border);border-radius:var(--radius-xs);
+  padding:9px 12px;font-size:.82rem;font-family:var(--font);color:var(--text);
+  background:var(--bg);outline:none;resize:none;line-height:1.5;
+  transition:border-color var(--trans),background var(--trans)}
+.note-input::placeholder{color:#C4CAD4}
+.note-input:focus{border-color:var(--primary);background:var(--white)}
+
+/* ─── SPECIAL / PROMO ─── */
+.special-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);
+  padding:13px;display:flex;gap:10px;align-items:flex-start;
+  border:1.5px solid var(--border);transition:border-color var(--trans)}
+.special-card:focus-within{border-color:var(--primary)}
+.special-card .sc-icon{width:40px;height:40px;background:var(--gold-lt);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.special-card textarea{flex:1;border:none;outline:none;font-size:.85rem;
+  font-family:var(--font);color:var(--text);background:transparent;resize:none;
+  line-height:1.6;min-height:48px}
+.special-card textarea::placeholder{color:#C4CAD4}
+
+.promo-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);
+  padding:12px 14px;display:flex;align-items:center;gap:10px;
+  border:2px dashed var(--border);transition:border-color var(--trans),border-style var(--trans)}
+.promo-card:focus-within{border-color:var(--primary);border-style:solid}
+.promo-card .pc-icon{width:40px;height:40px;background:#F0FFF4;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.promo-card input{flex:1;border:none;outline:none;font-size:.9rem;font-family:var(--font);
+  color:var(--text);background:transparent;text-transform:uppercase;letter-spacing:1px}
+.promo-card input::placeholder{color:#C4CAD4;text-transform:none;letter-spacing:0}
+.promo-apply{background:var(--green);color:#fff;border:none;padding:7px 14px;
+  border-radius:var(--radius-xs);font-family:var(--font);font-size:.78rem;font-weight:700;
+  cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;
+  transition:background var(--trans),transform var(--trans)}
+.promo-apply:hover{background:var(--green-d)}
+.promo-apply:active{transform:scale(.95)}
+.promo-msg{font-size:.72rem;font-weight:700;margin-top:6px;display:none;padding-left:4px}
+.promo-msg.ok{color:var(--green-d)} .promo-msg.err{color:var(--red)}
+
+/* ─── PAYMENT ─── */
+.pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pay-btn{background:var(--white);border:2px solid var(--border);border-radius:var(--radius-sm);
+  padding:12px 8px;font-family:var(--font);font-size:.8rem;font-weight:700;cursor:pointer;
+  color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:5px;
+  transition:all var(--trans);box-shadow:var(--shadow-sm);-webkit-tap-highlight-color:transparent}
+.pay-btn .picon{font-size:1.6rem}
+.pay-btn.active{border-color:var(--primary);background:var(--primary-lt);color:var(--primary);
+  box-shadow:0 4px 12px rgba(255,107,53,.2)}
+
+.qr-hint{display:none;background:var(--primary-lt);border:1.5px solid var(--primary-med);
+  border-radius:var(--radius-sm);padding:12px 14px;margin-top:10px;
+  align-items:center;gap:10px;cursor:pointer;transition:background var(--trans)}
+.qr-hint.show{display:flex}
+.qr-hint:hover{background:var(--primary-med)}
+.qr-hint-text{font-size:.8rem;font-weight:700;color:var(--primary-d)}
+.qr-hint-sub{font-size:.7rem;color:var(--muted);margin-top:2px}
+
+/* ─── SUMMARY BOX ─── */
+.summary-box{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-md);
+  padding:18px;margin-top:24px;border:2px solid var(--border);animation:fadeUp .4s ease .2s both}
+.sum-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sum-header h3{font-size:.7rem;font-weight:700;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--muted)}
+.sum-count{background:var(--primary-lt);color:var(--primary);
+  font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:100px}
+.sum-rows{display:flex;flex-direction:column;gap:10px}
+.sum-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;font-size:.86rem}
+.sr-left{flex:1;min-width:0;color:var(--muted)}
+.sr-left strong{display:block;color:var(--text);font-weight:700;margin-bottom:1px}
+.sr-left .rn{font-size:.7rem;color:var(--primary);font-style:italic}
+.sr-right{font-weight:700;color:var(--text);flex-shrink:0}
+.empty-hint{display:flex;flex-direction:column;align-items:center;
+  text-align:center;padding:14px 0 6px;color:#C4CAD4;font-size:.82rem;gap:6px}
+.empty-hint .ei{font-size:2.2rem}
+.divider{border:none;border-top:1.5px dashed var(--border);margin:14px 0}
+.fee-row{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);margin-bottom:6px}
+.fee-row .fv{font-weight:700;color:var(--text)}
+.disc-row{display:none;justify-content:space-between;font-size:.82rem;color:var(--green-d);margin-bottom:6px}
+.disc-row .fv{font-weight:700}
+.total-row{display:flex;justify-content:space-between;align-items:center}
+.total-lbl{font-size:.92rem;font-weight:700}
+.total-wrap{text-align:right}
+.total-amt{font-size:1.55rem;font-weight:700;color:var(--primary);letter-spacing:-1px}
+.total-amt.bump{animation:bump .25s ease}
+.total-cur{font-size:.78rem;color:var(--muted)}
+
+/* ─── STICKY BAR ─── */
+.sticky-bar{position:fixed;bottom:0;left:0;right:0;background:var(--white);
+  border-top:1.5px solid var(--border);
+  padding:10px 16px max(10px,env(safe-area-inset-bottom));
+  display:flex;align-items:center;gap:10px;z-index:500;
+  box-shadow:0 -6px 28px rgba(0,0,0,.09);
+  transform:translateY(100%);transition:transform var(--trans)}
+.sticky-bar.visible{transform:translateY(0)}
+.sticky-info{flex:1;min-width:0}
+.sticky-count{font-size:.70rem;color:var(--muted);font-weight:700}
+.sticky-total{font-size:1.15rem;font-weight:700;color:var(--primary);
+  letter-spacing:-.5px;white-space:nowrap}
+.sbtn{border:none;padding:13px 18px;font-size:.88rem;font-weight:700;
+  border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;
+  gap:7px;white-space:nowrap;font-family:var(--font);
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  transition:transform var(--trans),box-shadow var(--trans)}
+.sbtn:active{transform:scale(.96)}
+.sbtn-cart{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;
+  box-shadow:0 4px 16px rgba(255,107,53,.35);display:none}
+.sbtn-cart:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,107,53,.45)}
+.sbtn-wa{background:linear-gradient(135deg,#25D366,#1da851);color:#fff;
+  box-shadow:0 4px 16px rgba(37,211,102,.35)}
+.sbtn-wa:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,211,102,.45)}
+.sbtn svg{flex-shrink:0}
+
+/* ─── CART DRAWER ─── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:600;
+  opacity:0;pointer-events:none;transition:opacity var(--trans);
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.overlay.open{opacity:1;pointer-events:all}
+.cart-drawer{position:fixed;bottom:0;left:0;right:0;background:var(--white);
+  border-radius:24px 24px 0 0;z-index:700;max-height:88vh;
+  display:flex;flex-direction:column;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.32,1,.56,1);
+  box-shadow:var(--shadow-lg)}
+.cart-drawer.open{transform:translateY(0)}
+.drag-handle{width:40px;height:4px;background:var(--border);border-radius:100px;
+  margin:12px auto 0;flex-shrink:0}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px 10px;flex-shrink:0;border-bottom:1.5px solid var(--border)}
+.drawer-title{font-size:1rem;font-weight:700}
+.drawer-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--bg);
+  font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent}
+.drawer-body{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;padding:14px 18px}
+.di{display:flex;justify-content:space-between;align-items:flex-start;
+  padding:10px 0;border-bottom:1px solid var(--border);gap:10px}
+.di:last-child{border-bottom:none}
+.di-info{flex:1;min-width:0}
+.di-name{font-size:.88rem;font-weight:700}
+.di-note{font-size:.7rem;color:var(--muted);margin-top:2px;font-style:italic}
+.di-price{font-size:.88rem;font-weight:700;color:var(--primary);flex-shrink:0}
+.drawer-empty{text-align:center;padding:32px 0;color:#C4CAD4;font-size:.88rem}
+.drawer-empty .de-icon{font-size:2.5rem;display:block;margin-bottom:8px}
+.drawer-foot{padding:14px 18px;border-top:1.5px solid var(--border);flex-shrink:0}
+.drawer-total{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.dt-lbl{font-weight:700;font-size:.92rem}
+.dt-amt{font-size:1.3rem;font-weight:700;color:var(--primary)}
+.drawer-send{width:100%;background:linear-gradient(135deg,#25D366,#1da851);color:#fff;
+  border:none;padding:15px;font-size:.95rem;font-weight:700;border-radius:var(--radius-sm);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  font-family:var(--font);box-shadow:0 4px 16px rgba(37,211,102,.35);
+  -webkit-tap-highlight-color:transparent}
+.drawer-send:active{transform:scale(.98)}
+
+/* ─── QR MODAL ─── */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;
+  opacity:0;pointer-events:none;transition:opacity var(--trans);
+  display:flex;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.modal-ov.open{opacity:1;pointer-events:all}
+.qr-modal{background:var(--white);border-radius:24px 24px 0 0;width:100%;max-width:480px;
+  padding-bottom:max(20px,env(safe-area-inset-bottom));
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.32,1,.56,1);
+  box-shadow:var(--shadow-lg)}
+.modal-ov.open .qr-modal{transform:translateY(0)}
+.modal-handle{width:40px;height:4px;background:var(--border);
+  border-radius:100px;margin:12px auto 0}
+.modal-head{display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px 10px}
+.modal-title{font-size:1rem;font-weight:700}
+.modal-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--bg);
+  font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent}
+.modal-tabs{display:flex;gap:6px;padding:0 20px 12px}
+.mtab{flex:1;padding:9px;border:1.5px solid var(--border);border-radius:var(--radius-xs);
+  background:var(--white);font-family:var(--font);font-size:.78rem;font-weight:700;
+  cursor:pointer;color:var(--muted);text-align:center;transition:all var(--trans);
+  -webkit-tap-highlight-color:transparent}
+.mtab.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.modal-body{padding:4px 20px 20px;text-align:center}
+.qr-box{width:200px;height:200px;margin:0 auto 16px;border-radius:16px;
+  border:3px solid var(--border);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;background:var(--bg);gap:8px}
+.qr-box .qi{font-size:3.2rem}
+.qr-box .ql{font-size:.72rem;color:var(--muted);font-weight:700}
+.qr-bank{font-size:1rem;font-weight:700;margin-bottom:3px}
+.qr-acc{font-size:.82rem;color:var(--muted);margin-bottom:14px}
+.qr-amt-box{background:var(--primary-lt);border:1.5px solid var(--primary-med);
+  border-radius:var(--radius-sm);padding:12px 24px;display:inline-block;margin-bottom:16px}
+.qra-lbl{font-size:.7rem;color:var(--muted);font-weight:700;letter-spacing:.5px}
+.qra-val{font-size:1.5rem;font-weight:700;color:var(--primary);letter-spacing:-1px}
+.copy-btn{background:var(--text);color:#fff;border:none;padding:10px 22px;
+  border-radius:var(--radius-xs);font-family:var(--font);font-size:.82rem;font-weight:700;
+  cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  -webkit-tap-highlight-color:transparent}
+.copy-btn:active{transform:scale(.96)}
+
+/* ─── FOOTER ─── */
+footer{background:var(--white);border-top:1.5px solid var(--border);
+  padding:28px 16px;margin-top:32px;text-align:center}
+.footer-logo{font-size:2.2rem;margin-bottom:8px}
+.footer-name{font-size:1.05rem;font-weight:700;color:var(--text);margin-bottom:5px}
+.footer-info{font-size:.78rem;color:var(--muted);line-height:1.8;margin-bottom:16px}
+.footer-info a{color:var(--primary);text-decoration:none;font-weight:700}
+.footer-hours{display:inline-flex;flex-direction:column;gap:6px;background:var(--bg);
+  border-radius:var(--radius-sm);padding:14px 20px;margin-bottom:18px;
+  text-align:left;width:100%;max-width:280px}
+.fhr{display:flex;align-items:center;gap:8px;font-size:.8rem}
+.fhr .dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.fhr .dot.off{background:#E5E7EB}
+.fhr-lbl{color:var(--muted);width:82px;font-size:.78rem}
+.fhr-time{font-weight:700;color:var(--text);font-size:.78rem}
+.footer-social{display:flex;justify-content:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.soc-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:100px;
+  border:1.5px solid var(--border);font-family:var(--font);font-size:.78rem;
+  font-weight:700;text-decoration:none;color:var(--text);background:var(--bg);
+  transition:all var(--trans)}
+.soc-btn:hover{background:var(--primary-lt);border-color:var(--primary);color:var(--primary)}
+.soc-btn.wa{background:#F0FFF4;border-color:#C6F6D5}
+.footer-copy{font-size:.68rem;color:#C4CAD4}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:rgba(26,26,46,.92);color:#fff;padding:10px 20px;border-radius:100px;
+  font-size:.82rem;font-weight:700;opacity:0;pointer-events:none;z-index:900;
+  transition:opacity .25s,transform .25s;white-space:nowrap;
+  box-shadow:0 4px 20px rgba(0,0,0,.25);max-width:calc(100vw - 40px);text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ─── ANIMATIONS ─── */
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(74,222,128,.35)}50%{box-shadow:0 0 0 6px rgba(74,222,128,.1)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes qb{0%{transform:scale(1)}30%{transform:scale(1.35)}60%{transform:scale(.88)}100%{transform:scale(1)}}
+.qbounce{animation:qb .3s ease}
+
+/* ─── RESPONSIVE ─── */
+@media(min-width:480px){
+  header h1{font-size:2rem} .header-emoji{font-size:62px}
+  .menu-img{width:78px;height:78px;font-size:38px}
+  .total-amt{font-size:1.75rem}
+  .pay-grid{grid-template-columns:repeat(4,1fr)}
+  .sbtn-clear{
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    background:#fff!important;color:#8b3f24!important;
+    border:1px solid #e6c9ba!important;
+    box-shadow:0 4px 12px rgba(92,43,25,.10)!important;
+  }
+  .sbtn-clear:hover{background:#fff5ef!important;transform:translateY(-1px)}
+  .sbtn-clear:active{transform:translateY(0) scale(.98)}
+  .sbtn-cart{display:flex!important}
+}
+@media(min-width:600px){
+  .container{padding:0 20px}
+  .sticky-bar{padding:12px 24px max(12px,env(safe-area-inset-bottom))}
+}
+
+/* ─── DARK MODE ─── */
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#111117; --white:#1C1C24; --text:#F0EDE9; --muted:#9CA3AF;
+    --border:#2E2E3A; --primary-lt:#2A1A10; --gold-lt:#2A2010; --primary-med:#4A2A18;
+  }
+  header{background:linear-gradient(145deg,#CC4E1E 0%,#E06540 55%,#D4804A 100%)}
+  .header-wave,.toast{background-color:var(--bg)}
+  .note-input{background:var(--bg);color:var(--text)}
+  .footer-hours{background:#0D0D12}
+}
+
+/* ─── CART BADGE (sticky qty bubble) ─── */
+.cart-badge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;
+  width:20px;height:20px;border-radius:50%;font-size:.62rem;font-weight:700;
+  display:none;align-items:center;justify-content:center;
+  box-shadow:0 2px 6px rgba(255,71,87,.5);border:2px solid var(--white);
+  pointer-events:none;z-index:10}
+.cart-badge.show{display:flex}
+.sbtn-wa{position:relative}
+
+.menu-img{position:relative}
+
+/* Uploaded food photos */
+.menu-img.photo-menu{overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fff3df!important;cursor:zoom-in;position:relative;}
+.photo-hit{display:block;width:100%;height:100%;padding:0;border:0;background:transparent;cursor:zoom-in;font:inherit;color:inherit;}
+.photo-hit img{pointer-events:none;}
+.menu-img.photo-menu img{width:100%;height:100%;display:block;object-fit:cover;border-radius:inherit;}
+.menu-img.photo-menu img[src=""]{display:none;}
+.menu-img.no-photo{display:flex;align-items:center;justify-content:center;}
+.card-top{position:relative}
+
+
+/* Click-to-view menu photo */
+.menu-img.photo-menu{cursor:zoom-in;}
+.menu-img.photo-menu::after{pointer-events:none;}
+.photo-viewer{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:22px;z-index:99999;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);}
+.photo-viewer.show{display:flex;}
+.photo-viewer-inner{position:relative;max-width:min(94vw,760px);max-height:90vh;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.photo-viewer-img{max-width:94vw;max-height:78vh;width:auto;height:auto;object-fit:contain;border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.45);background:#fff;}
+.photo-viewer-title{color:#fff;font-weight:700;text-align:center;font-size:1rem;max-width:90vw;}
+.photo-viewer-close{position:absolute;right:-8px;top:-8px;width:42px;height:42px;border:0;border-radius:50%;background:#fff;color:#222;font-size:25px;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.3);}
+@media(max-width:470px){.photo-viewer{padding:14px}.photo-viewer-img{max-height:74vh;border-radius:14px}.photo-viewer-close{right:0;top:-52px}}
+
+/* ─── SOLD-OUT OVERLAY ─── */
+.sold-out-overlay{position:absolute;inset:0;background:rgba(250,247,245,.82);
+  display:flex;align-items:center;justify-content:center;border-radius:var(--radius);
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);z-index:5;display:none}
+.sold-out-overlay.show{display:flex}
+.so-label{background:var(--red);color:#fff;font-size:.72rem;font-weight:700;
+  padding:4px 12px;border-radius:100px;letter-spacing:.5px}
+.menu-card{position:relative}
+
+/* ─── SHARE BUTTON ─── */
+.share-btn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.30);
+  border-radius:100px;padding:5px 11px;font-size:.72rem;font-weight:700;color:#fff;
+  cursor:pointer;font-family:var(--font);backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);transition:background var(--trans);
+  -webkit-tap-highlight-color:transparent;display:flex;align-items:center;gap:5px}
+.share-btn:hover{background:rgba(255,255,255,.28)}
+
+/* ─── BACK-TO-TOP ─── */
+.btt-btn{position:fixed;bottom:100px;right:16px;width:44px;height:44px;
+  background:var(--primary);color:#fff;border:none;border-radius:50%;
+  font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(255,107,53,.4);z-index:400;
+  opacity:0;pointer-events:none;transform:translateY(10px);
+  transition:opacity var(--trans),transform var(--trans);
+  -webkit-tap-highlight-color:transparent}
+.btt-btn.show{opacity:1;pointer-events:all;transform:translateY(0)}
+.btt-btn:active{transform:scale(.9)}
+
+/* ─── ORDER HISTORY ─── */
+.history-wrap{display:flex;flex-direction:column;gap:10px}
+.hist-card{background:var(--white);border-radius:var(--radius-sm);
+  box-shadow:var(--shadow-sm);padding:13px 14px;border-left:3px solid var(--primary);
+  animation:fadeUp .3s ease both}
+.hist-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.hist-time{font-size:.7rem;color:var(--muted);font-weight:700}
+.hist-total{font-size:.88rem;font-weight:700;color:var(--primary)}
+.hist-items{font-size:.78rem;color:var(--muted);line-height:1.8}
+.hi-customer{background:var(--bg);border-radius:var(--radius-xs);
+  padding:8px 10px;margin-top:6px;display:flex;flex-direction:column;gap:3px}
+.hi-row{font-size:.76rem;color:var(--text);line-height:1.5}
+.hist-reorder{background:var(--primary-lt);color:var(--primary);border:1.5px solid var(--primary-med);
+  border-radius:var(--radius-xs);padding:5px 12px;font-family:var(--font);
+  font-size:.75rem;font-weight:700;cursor:pointer;margin-top:8px;
+  transition:background var(--trans);-webkit-tap-highlight-color:transparent}
+.hist-reorder:hover{background:var(--primary-med)}
+.hist-empty{text-align:center;padding:20px 0;color:#C4CAD4;font-size:.82rem}
+.hist-empty span{display:block;font-size:2rem;margin-bottom:6px}
+.hist-clear-btn{background:none;border:1.5px solid var(--border);border-radius:var(--radius-xs);
+  padding:6px 14px;font-family:var(--font);font-size:.75rem;font-weight:700;
+  color:var(--muted);cursor:pointer;transition:all var(--trans);margin-top:4px}
+.hist-clear-btn:hover{border-color:var(--red);color:var(--red)}
+
+/* ─── PRINT RECEIPT ─── */
+.print-btn{background:var(--white);border:1.5px solid var(--border);
+  border-radius:var(--radius-xs);padding:8px 16px;font-family:var(--font);
+  font-size:.78rem;font-weight:700;color:var(--muted);cursor:pointer;
+  display:flex;align-items:center;gap:6px;transition:all var(--trans);
+  -webkit-tap-highlight-color:transparent}
+.print-btn:hover{border-color:var(--primary);color:var(--primary)}
+.summary-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+
+/* ─── MAPS LINK ─── */
+.maps-link{display:inline-flex;align-items:center;gap:6px;color:var(--primary);
+  text-decoration:none;font-size:.78rem;font-weight:700;
+  padding:6px 12px;background:var(--primary-lt);border-radius:100px;
+  transition:background var(--trans);-webkit-tap-highlight-color:transparent}
+.maps-link:hover{background:var(--primary-med)}
+
+/* ─── PIN FIELD BUTTON ─── */
+.pin-field-btn{width:100%;background:var(--primary-lt);border:2px dashed var(--primary-med);
+  border-radius:var(--radius-sm);padding:12px 14px;cursor:pointer;
+  display:flex;align-items:center;gap:10px;font-family:var(--font);
+  transition:background var(--trans),border-color var(--trans),transform var(--trans);
+  -webkit-tap-highlight-color:transparent;text-align:left}
+.pin-field-btn:hover{background:var(--primary-med);border-color:var(--primary)}
+.pin-field-btn:active{transform:scale(.98)}
+.pin-field-btn.loading{opacity:.7;pointer-events:none}
+.pin-field-btn.done{background:#F0FFF4;border-color:#C6F6D5;border-style:solid}
+.pfb-icon{font-size:1.4rem;flex-shrink:0;line-height:1}
+.pfb-text{flex:1;min-width:0}
+.pfb-text span:first-child{display:block;font-size:.85rem;font-weight:700;
+  color:var(--primary);line-height:1.3}
+.pfb-sub{font-size:.72rem;color:var(--muted);font-weight:400;margin-top:1px}
+.pfb-arrow{font-size:1.3rem;color:var(--primary);flex-shrink:0;transition:transform var(--trans)}
+.pin-field-btn:hover .pfb-arrow{transform:translateX(3px)}
+.pin-field-status{background:#F0FFF4;border:1.5px solid #C6F6D5;border-radius:var(--radius-sm);
+  padding:10px 14px;display:flex;align-items:flex-start;gap:10px;font-size:.82rem;
+  animation:fadeUp .25s ease}
+.pin-field-status.error{background:#FFF5F5;border-color:#FEB2B2}
+.pin-field-status > span:first-child{font-size:1.1rem;flex-shrink:0;margin-top:1px}
+.pin-field-status > div{flex:1;min-width:0}
+#pinFieldStatusText{font-weight:700;color:#1EB256;font-size:.82rem}
+.pin-field-status.error #pinFieldStatusText{color:#E53E3E}
+.pin-field-coords{font-size:.7rem;color:var(--muted);margin-top:2px;word-break:break-all}
+.pfb-clear{background:none;border:none;font-size:.9rem;cursor:pointer;color:var(--muted);
+  padding:2px 4px;flex-shrink:0;border-radius:4px;transition:color var(--trans),background var(--trans);
+  -webkit-tap-highlight-color:transparent;align-self:flex-start}
+.pfb-clear:hover{color:var(--red);background:#FFF5F5}
+
+/* ─── PIN LOCATION MODAL ─── */
+.pin-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:850;
+  opacity:0;pointer-events:none;transition:opacity var(--trans);
+  display:flex;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.pin-modal-ov.open{opacity:1;pointer-events:all}
+.pin-modal{background:var(--white);border-radius:24px 24px 0 0;width:100%;max-width:480px;
+  padding-bottom:max(20px,env(safe-area-inset-bottom));
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.32,1,.56,1);
+  box-shadow:var(--shadow-lg)}
+.pin-modal-ov.open .pin-modal{transform:translateY(0)}
+.pin-modal-handle{width:40px;height:4px;background:var(--border);
+  border-radius:100px;margin:12px auto 0}
+.pin-modal-head{display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px 10px}
+.pin-modal-title{font-size:1rem;font-weight:700}
+.pin-modal-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--bg);
+  font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent}
+.pin-modal-body{padding:8px 20px 20px;display:flex;flex-direction:column;gap:12px}
+.pin-map-box{width:100%;height:200px;border-radius:var(--radius-sm);
+  border:2px solid var(--border);overflow:hidden;position:relative;
+  background:var(--bg);display:flex;align-items:center;justify-content:center}
+.pin-map-box iframe{width:100%;height:100%;border:none}
+.pin-map-placeholder{display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:8px;color:var(--muted);font-size:.82rem;text-align:center;
+  padding:16px}
+.pin-map-placeholder .pm-icon{font-size:2.8rem}
+.pin-status{background:var(--primary-lt);border:1.5px solid var(--primary-med);
+  border-radius:var(--radius-sm);padding:11px 14px;font-size:.82rem;
+  color:var(--primary-d);font-weight:700;display:flex;align-items:center;gap:8px;
+  min-height:44px}
+.pin-status .ps-icon{font-size:1.2rem;flex-shrink:0}
+.pin-status.success{background:#F0FFF4;border-color:#C6F6D5;color:#1EB256}
+.pin-status.error  {background:#FFF5F5;border-color:#FEB2B2;color:#E53E3E}
+.pin-coords{font-size:.7rem;font-weight:400;color:var(--muted);margin-top:2px}
+.pin-actions{display:flex;flex-direction:column;gap:8px}
+.pin-btn{width:100%;padding:14px;border:none;border-radius:var(--radius-sm);
+  font-family:var(--font);font-size:.9rem;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  -webkit-tap-highlight-color:transparent;transition:transform var(--trans),box-shadow var(--trans)}
+.pin-btn:active{transform:scale(.97)}
+.pin-btn-locate{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:#fff;
+  box-shadow:0 4px 14px rgba(255,107,53,.3)}
+.pin-btn-locate:hover{box-shadow:0 6px 20px rgba(255,107,53,.4)}
+.pin-btn-send{background:linear-gradient(135deg,#25D366,#1da851);color:#fff;
+  box-shadow:0 4px 14px rgba(37,211,102,.3)}
+.pin-btn-send:hover{box-shadow:0 6px 20px rgba(37,211,102,.4)}
+.pin-btn-send:disabled{background:#9CA3AF;box-shadow:none;cursor:not-allowed}
+.pin-btn-skip{background:var(--white);color:var(--muted);border:1.5px solid var(--border);
+  font-size:.82rem}
+.pin-btn-skip:hover{border-color:var(--muted)}
+.pin-divider{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.72rem}
+.pin-divider::before,.pin-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+/* address field shown in delivery */
+.pin-addr-field{background:var(--white);border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);padding:11px 14px;font-size:.85rem;font-family:var(--font);
+  color:var(--text);outline:none;width:100%;resize:none;
+  transition:border-color var(--trans)}
+.pin-addr-field:focus{border-color:var(--primary)}
+
+/* ─── SKELETON LOADER ─── */
+@keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+.skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);
+  background-size:1200px 100%;animation:shimmer 1.4s infinite;border-radius:8px}
+.skel-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);
+  padding:14px;display:flex;gap:12px;align-items:center}
+.skel-img{width:72px;height:72px;border-radius:14px;flex-shrink:0}
+.skel-lines{flex:1;display:flex;flex-direction:column;gap:8px}
+.skel-line{height:12px;border-radius:6px}
+.skel-line.w80{width:80%}.skel-line.w60{width:60%}.skel-line.w40{width:40%}
+#skeletonLoader{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+
+/* ─── MIN ORDER WARNING ─── */
+.min-order-warn{background:#FFF8E1;border:1.5px solid #FFD54F;border-radius:var(--radius-sm);
+  padding:10px 14px;font-size:.78rem;font-weight:700;color:#F57F17;
+  display:none;align-items:center;gap:8px;margin-top:8px}
+.min-order-warn.show{display:flex}
+
+/* ─── HIST PIN MODAL ─── */
+.hist-pin-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:900;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .22s ease;
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:20px}
+.hist-pin-modal-ov.open{opacity:1;pointer-events:all}
+.hist-pin-modal{background:var(--white);border-radius:var(--radius);
+  width:100%;max-width:320px;padding:28px 24px 24px;
+  box-shadow:var(--shadow-lg);text-align:center;
+  transform:scale(.88) translateY(20px);
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+  display:flex;flex-direction:column;align-items:center;gap:12px}
+.hist-pin-modal-ov.open .hist-pin-modal{transform:scale(1) translateY(0)}
+.hpm-icon{font-size:2.6rem;line-height:1}
+.hpm-title{font-size:1rem;font-weight:700;color:var(--text)}
+.hpm-sub{font-size:.76rem;color:var(--muted);line-height:1.5}
+.hpm-input{width:100%;border:2px solid var(--border);border-radius:var(--radius-sm);
+  padding:13px 16px;font-size:1.5rem;font-family:var(--font);color:var(--text);
+  background:var(--bg);outline:none;text-align:center;letter-spacing:10px;
+  transition:border-color .2s;-webkit-text-security:disc}
+.hpm-input:focus{border-color:var(--primary)}
+.hpm-input.shake{animation:shake .3s ease}
+.hpm-err{font-size:.74rem;color:var(--red);font-weight:700;min-height:18px}
+.hpm-actions{display:flex;gap:8px;width:100%}
+.hpm-btn{flex:1;padding:12px;border:none;border-radius:var(--radius-xs);
+  font-family:var(--font);font-size:.88rem;font-weight:700;cursor:pointer;
+  transition:background .2s,transform .15s;-webkit-tap-highlight-color:transparent}
+.hpm-btn:active{transform:scale(.96)}
+.hpm-btn-cancel{background:var(--bg);color:var(--muted);border:1.5px solid var(--border)}
+.hpm-btn-cancel:hover{border-color:var(--muted)}
+.hpm-btn-ok{background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(255,107,53,.3)}
+.hpm-btn-ok:hover{background:var(--primary-d)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media print{
+  .sticky-bar,.install-banner,.btt-btn,.share-btn,.lang-btn,
+  .cat-scroll,.order-type-wrap,.promo-card,.pay-grid,.qr-hint,
+  .special-card,.drawer-overlay,.cart-drawer,.modal-ov,
+  .toast,.footer-social,.summary-actions,
+  .qty-ctrl,.note-row,.sold-out-overlay{display:none!important}
+  header{background:#FF6B35!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{padding-bottom:0!important}
+  .summary-box{box-shadow:none!important;border:1.5px solid #ccc!important}
+  .menu-card{box-shadow:none!important;break-inside:avoid}
+}
+
+.lang-wrap{position:relative;z-index:50}.lang-menu{position:absolute;right:0;top:calc(100% + 7px);display:none;min-width:155px;padding:6px;background:var(--white);border:1px solid var(--border);border-radius:14px;box-shadow:0 14px 30px rgba(0,0,0,.16)}.lang-menu.open{display:block}.lang-menu button{display:block;width:100%;border:0;background:transparent;color:var(--text);padding:9px 10px;border-radius:9px;text-align:left;font-family:var(--font);font-size:.76rem;font-weight:700;cursor:pointer}.lang-menu button:hover{background:var(--primary-lt);color:var(--primary)}
+/* ═══════════════════════════════════════
+   MODERN HOME PAGE — visual style inspired by the reference mockup
+═══════════════════════════════════════ */
+body{background:linear-gradient(180deg,#fff7f2 0,#fffaf8 38%,var(--bg) 100%)}
+header{padding:14px 16px 58px;background:linear-gradient(135deg,#f4511e 0%,#ff7043 48%,#ffab73 100%);border-radius:0 0 34px 34px;box-shadow:0 10px 30px rgba(255,107,53,.20)}
+header::before{width:320px;height:320px;top:-160px;right:-90px;background:rgba(255,255,255,.10)}
+header::after{width:210px;height:210px;bottom:-130px;left:-80px;background:rgba(255,255,255,.08)}
+.header-top{margin-bottom:20px}
+.header-center{padding:4px 8px 0}
+.header-emoji{font-size:62px;margin-bottom:7px;filter:drop-shadow(0 8px 12px rgba(80,30,10,.22))}
+header h1{font-size:2rem;letter-spacing:-.5px}
+header .tagline{font-size:.78rem;max-width:390px;margin:7px auto 0;line-height:1.65}
+.header-pills{gap:7px;margin-top:15px}
+.h-pill{padding:6px 11px;background:rgba(255,255,255,.22);font-size:.68rem}
+.container{max-width:680px;padding:0 16px;position:relative}
+.install-banner{margin-top:-26px;position:relative;z-index:5;box-shadow:0 10px 30px rgba(255,107,53,.12)}
+.home-hero{margin-top:-28px;position:relative;z-index:4;background:linear-gradient(135deg,#fff 0%,#fff7f2 100%);border:1px solid rgba(255,107,53,.12);border-radius:26px;padding:18px;box-shadow:0 14px 40px rgba(50,30,20,.10)}
+.hero-row{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.hero-copy{flex:1;min-width:0}
+.hero-kicker{font-size:.68rem;font-weight:700;letter-spacing:1.3px;color:var(--primary);text-transform:uppercase;margin-bottom:4px}
+.hero-title{font-size:1.22rem;font-weight:700;line-height:1.35;color:var(--text)}
+.hero-sub{font-size:.73rem;color:var(--muted);line-height:1.55;margin-top:5px}
+.hero-bowl{width:78px;height:78px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:43px;background:linear-gradient(145deg,#fff0e8,#ffe0cf);box-shadow:inset 0 1px 0 #fff,0 8px 20px rgba(255,107,53,.15);flex-shrink:0}
+.quick-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.quick-btn{border:1px solid var(--border);background:#fff;border-radius:14px;padding:10px 6px;text-decoration:none;color:var(--text);font-family:var(--font);font-size:.72rem;font-weight:700;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.05);transition:transform .2s,box-shadow .2s}
+.quick-btn span{display:block;font-size:1.35rem;margin-bottom:3px}
+.quick-btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,0,0,.08)}
+.slabel{margin:22px 0 10px;font-size:.68rem}
+.otype-wrap{padding:6px;border-radius:17px;box-shadow:0 8px 22px rgba(0,0,0,.07)}
+.otype-btn{min-height:52px;border-radius:13px;font-size:.76rem}
+.fields{gap:8px}
+.field-card{border-radius:15px;padding:10px 12px}
+.cat-scroll{margin:0 -16px;padding:0 16px}
+.cat-tabs{gap:7px}
+.cat-tab{padding:9px 14px;font-size:.75rem;border-radius:13px}
+.cat-tab.active{box-shadow:0 6px 16px rgba(255,107,53,.24)}
+.menu-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+.menu-card{border-radius:18px;box-shadow:0 7px 22px rgba(0,0,0,.06)}
+.card-top{display:block;padding:10px}
+.menu-img{width:100%;height:122px;border-radius:14px;font-size:48px;margin-bottom:9px;background:linear-gradient(145deg,#fff0e8,#ffe4d4)!important}
+.menu-info{min-height:72px}
+.menu-name{font-size:.82rem;line-height:1.4;min-height:34px}
+.menu-desc{font-size:.66rem;margin-top:2px}
+.menu-price{font-size:.83rem;margin-top:5px}
+.qty-ctrl{position:absolute;right:9px;bottom:9px;background:#fff;border-radius:100px;padding:2px;box-shadow:0 4px 12px rgba(0,0,0,.10)}
+.qty-btn{width:30px;height:30px;font-size:.95rem}
+.qty-disp{width:25px;font-size:.86rem}
+.note-row{padding:0 10px 10px}
+.summary-box{border-radius:20px;padding:16px;box-shadow:0 12px 34px rgba(0,0,0,.09)}
+.sticky-bar{background:rgba(255,247,241,.98);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:10px 14px max(10px,env(safe-area-inset-bottom));border-top:1px solid #f0d8ca;box-shadow:0 -8px 24px rgba(92,43,25,.10)}
+.sticky-count{font-size:.78rem!important;font-weight:800!important;color:#6b2815!important;line-height:1.35}
+.sticky-total{font-size:1.28rem!important;font-weight:900!important;color:#b83f17!important;letter-spacing:-.3px}
+.sbtn{font-size:.92rem!important;font-weight:900!important}
+
+.sbtn{border-radius:14px;padding:12px 16px}
+footer{border-radius:28px 28px 0 0;margin-top:28px}
+@media(max-width:470px){.menu-list{grid-template-columns:repeat(2,minmax(0,1fr))}.menu-img{height:104px;font-size:42px}.menu-name{font-size:.78rem}.menu-desc{display:none}.qty-ctrl{right:7px;bottom:7px}.hero-title{font-size:1.08rem}}
+@media(min-width:680px){.menu-list{grid-template-columns:repeat(3,minmax(0,1fr))}.menu-img{height:135px}.container{max-width:900px}}
+
+
+/* Minnie & Tina logo */
+.logo-header-center{padding-top:10px}
+.site-logo{display:block;width:min(300px,78vw);height:auto;margin:0 auto 8px;object-fit:contain;filter:drop-shadow(0 8px 14px rgba(65,35,20,.12));border-radius:18px}
+.logo-tagline{font-size:.74rem;font-weight:600;line-height:1.5;color:rgba(255,255,255,.96);margin:0 auto 10px;text-align:center}
+@media(min-width:680px){.site-logo{width:330px}}
+
+
+/* FINAL LANGUAGE MENU FIX */
+.lang-wrap{position:relative!important;z-index:99999!important}
+.lang-btn{position:relative!important;z-index:100000!important;touch-action:manipulation!important;pointer-events:auto!important}
+.lang-menu{position:absolute!important;z-index:100001!important;pointer-events:auto!important;overflow:visible!important}
+.lang-menu.open{display:block!important;visibility:visible!important;opacity:1!important}
+.lang-menu button{position:relative!important;z-index:100002!important;pointer-events:auto!important;touch-action:manipulation!important}
+
+/* Stable language selector: native select avoids custom dropdown click/focus locking */
+.stable-lang{position:relative;z-index:1000}
+.lang-select-wrap{display:flex;align-items:center;gap:5px;padding:6px 9px;border-radius:12px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);cursor:pointer}
+.lang-globe{font-size:.95rem;line-height:1}
+.lang-select{appearance:auto;-webkit-appearance:auto;border:0;outline:0;background:transparent;color:#fff;font-family:var(--font);font-size:.75rem;font-weight:700;cursor:pointer;max-width:145px}
+.lang-select option{background:#fff;color:#222;font-family:var(--font);font-weight:600}
+.lang-select:focus{outline:2px solid rgba(255,255,255,.7);outline-offset:2px}
+
+/* ═══════════════════════════════════════
+   POLISHED MINNIE NOODLE HOME — one logo + hero cover
+═══════════════════════════════════════ */
+body{background:#fffaf6;color:#4a2114}
+.main-header{position:relative;background:linear-gradient(135deg,#f4511e 0%,#ff6f2c 48%,#ff9b55 100%);padding:0;border-radius:0 0 32px 32px;box-shadow:0 12px 35px rgba(180,75,20,.20);overflow:visible;z-index:30}
+.nav-shell{max-width:1180px;margin:auto;min-height:82px;padding:10px 22px;display:grid;grid-template-columns:270px 1fr auto;align-items:center;gap:20px;position:relative;z-index:5}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;min-width:0}.brand-name{font-weight:900;font-size:1.02rem;white-space:nowrap;text-shadow:0 2px 8px rgba(80,20,0,.18)}
+.header-clock-box{display:flex;align-items:center;gap:7px;color:#fff;font-weight:800;line-height:1.15;white-space:nowrap;padding:7px 10px;border-radius:14px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.20);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.header-clock-box .clock-icon{font-size:1.05rem}.header-clock{font-size:.64rem;min-width:74px;text-align:center;opacity:.98}
+.main-nav{display:flex;justify-content:center;gap:8px}.main-nav a{display:flex;align-items:center;gap:7px;padding:10px 12px;border-radius:14px;color:#fff;text-decoration:none;font-size:.78rem;transition:.2s}.main-nav a:hover{background:rgba(255,255,255,.18);transform:translateY(-1px)}.main-nav a span{font-size:1.35rem;line-height:1}.main-nav b{font-weight:700}
+.nav-tools{display:flex;align-items:center;gap:8px}.nav-tools .share-btn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.28);font-size:1.15rem;cursor:pointer}.lang-select-wrap{display:flex!important;align-items:center;gap:6px;padding:7px 11px!important;background:#fff!important;border:0!important;border-radius:999px!important;box-shadow:0 5px 16px rgba(80,30,10,.10);color:#642415;cursor:pointer}.lang-flag{font-size:1.1rem}.lang-select{color:#642415!important;font-size:.76rem!important;font-weight:800!important;max-width:130px}.lang-select option{color:#222!important;background:#fff}
+.hero-cover{position:relative;min-height:410px;overflow:hidden;background:radial-gradient(circle at 74% 48%,rgba(255,255,255,.95) 0 9%,rgba(255,237,216,.88) 25%,rgba(255,192,132,.25) 48%,transparent 68%),linear-gradient(115deg,#fff0d8 0%,#fff8ef 48%,#ffd0a0 100%)}
+.hero-cover:before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,248,237,.96) 0%,rgba(255,248,237,.82) 38%,rgba(255,248,237,.10) 72%,rgba(112,38,10,.12) 100%);pointer-events:none}.hero-content{max-width:1180px;margin:auto;min-height:410px;padding:44px 34px 52px;display:flex;align-items:center;justify-content:space-between;gap:30px;position:relative;z-index:2}.hero-copy-new{max-width:600px}.hero-eyebrow{display:inline-flex;padding:7px 13px;border-radius:999px;background:#fff3e7;color:#e95720;font-size:.76rem;font-weight:800;box-shadow:0 6px 18px rgba(140,65,25,.08)}.hero-copy-new h1{font-size:clamp(2.4rem,5.2vw,4.8rem);line-height:1.02;margin:15px 0 7px;color:#6b2815;font-weight:900;letter-spacing:-1px;text-shadow:0 2px 0 #fff}.hero-slogan{font-size:clamp(1.15rem,2.3vw,1.8rem);font-weight:800;color:#e84f1b;margin:0 0 8px}.hero-desc{font-size:.88rem;line-height:1.8;color:#704d40;max-width:560px}.hero-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}.hero-cta{display:inline-flex;align-items:center;gap:9px;border-radius:999px;padding:12px 18px;text-decoration:none;font-size:.8rem;font-family:var(--font);transition:.2s}.hero-cta.primary{background:#f65d1f;color:#fff;box-shadow:0 9px 22px rgba(245,93,31,.28)}.hero-cta.ghost{background:#fff;color:#b94015;border:1px solid #ffd2bd}.hero-cta:hover{transform:translateY(-2px)}.hero-cta i{font-size:1.4rem;font-style:normal;line-height:1}.hero-meta{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:16px;color:#805f52;font-size:.7rem;font-weight:700}.hero-food-wrap{position:relative;width:min(430px,42vw);aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;flex-shrink:0}.hero-food-ring{position:absolute;width:94%;height:94%;border-radius:50%;background:radial-gradient(circle,#fff 0 43%,#ffe0bd 44% 58%,rgba(255,255,255,0) 59%);filter:drop-shadow(0 18px 28px rgba(105,45,15,.18))}.hero-food{position:relative;width:83%;height:83%;object-fit:cover;border-radius:50%;border:9px solid #fff;box-shadow:0 18px 45px rgba(83,36,12,.24);transform:rotate(-3deg)}.hero-badge{position:absolute;right:0;bottom:7%;display:flex;align-items:center;gap:7px;background:#fff;border-radius:999px;padding:8px 13px;color:#7b2d16;box-shadow:0 10px 24px rgba(80,30,10,.16);font-size:.7rem}.hero-badge span{color:#f24e1c;font-size:1.1rem}.hero-bottom-wave{position:absolute;bottom:-1px;left:-2%;width:104%;height:36px;background:#fffaf6;border-radius:50% 50% 0 0/100% 100% 0 0}
+.container{max-width:1180px!important;padding:0 22px!important}.welcome-strip{margin:-2px 0 16px;padding:12px 16px;background:#fff;border:1px solid #f1e4dc;border-radius:20px;display:grid;grid-template-columns:repeat(4,1fr);box-shadow:0 8px 25px rgba(80,35,15,.07);position:relative;z-index:4}.welcome-item{display:flex;align-items:center;justify-content:center;gap:9px;padding:7px 12px;border-right:1px solid #f0e7e1}.welcome-item:last-child{border-right:0}.welcome-item>span{width:38px;height:38px;border-radius:50%;background:#fff2b9;display:flex;align-items:center;justify-content:center;font-size:1.15rem}.welcome-item b{display:block;font-size:.72rem}.welcome-item small{display:block;margin-top:2px;color:#8b756b;font-size:.6rem}
+.install-banner{margin-top:14px!important}.slabel{color:#6b2815;font-size:.8rem;font-weight:800;margin-top:25px}.cat-tab{background:#fff!important;border:1px solid #f0e2da!important}.cat-tab.active{background:#f65d1f!important;color:#fff!important}.menu-list{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important}.menu-card{background:#fff;border:1px solid #f0e6df;box-shadow:0 8px 24px rgba(75,35,15,.08);transition:transform .2s,box-shadow .2s}.menu-card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(75,35,15,.13)}.menu-img{height:170px!important;border-radius:15px!important}.menu-name{color:#5e2818;font-size:.9rem}.menu-price{color:#ef5b1c;font-size:.95rem}.summary-box{background:#fff;border:1px solid #f0e2da}.sticky-bar{box-shadow:0 -8px 25px rgba(70,30,10,.10)}footer{background:linear-gradient(135deg,#4b1e10,#7a2c13)!important}
+@media(max-width:900px){.nav-shell{grid-template-columns:auto 1fr auto}.brand-name{display:none}.main-nav{gap:2px}.main-nav a{padding:8px}.main-nav a b{display:none}.main-nav a span{font-size:1.3rem}.hero-content{padding:34px 24px 48px}.hero-food-wrap{width:38vw}.menu-list{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:680px){.nav-shell{min-height:68px;padding:8px 12px;grid-template-columns:1fr auto}.brand{justify-self:start}.brand-name{font-size:.9rem}.main-nav{display:none}.nav-tools{justify-self:end}.nav-tools .share-btn{display:none}.header-clock-box{padding:5px 7px;gap:5px}.header-clock{font-size:.56rem;min-width:62px}.header-clock-box .clock-icon{font-size:.9rem}.lang-select-wrap{padding:6px 9px!important}.hero-cover{min-height:500px}.hero-content{min-height:500px;padding:28px 18px 58px;display:block}.hero-copy-new{max-width:none;text-align:center}.hero-eyebrow{font-size:.66rem}.hero-copy-new h1{font-size:2.55rem;margin-top:11px}.hero-slogan{font-size:1.2rem}.hero-desc{font-size:.72rem;line-height:1.65}.hero-actions{justify-content:center}.hero-meta{justify-content:center}.hero-food-wrap{width:250px;max-width:75vw;margin:14px auto 0}.hero-badge{right:-3px}.welcome-strip{grid-template-columns:repeat(2,1fr);gap:4px;padding:9px}.welcome-item{border-right:0}.welcome-item>span{width:32px;height:32px;font-size:1rem}.welcome-item b{font-size:.63rem}.welcome-item small{font-size:.54rem}.container{padding:0 12px!important}.menu-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}.menu-img{height:118px!important}.menu-name{font-size:.78rem}}
+
+</style>
+
+<style id="mobile-exact-polish">
+@media(max-width:680px){
+ .main-header{background:linear-gradient(135deg,#ff4f16 0%,#ff6b2b 55%,#ff8747 100%)!important;padding:8px 10px 16px!important;border-radius:0 0 30px 30px!important}
+ .nav-shell{min-height:96px!important;grid-template-columns:29% 37% 34%!important;padding:2px 2px 6px!important;align-items:center!important}
+ .mobile-brand-logo{height:94px!important;align-items:center!important}
+ .mobile-header-logo{width:84px!important;height:84px!important;padding:3px!important;border:3px solid rgba(255,255,255,.95)!important;box-shadow:0 8px 20px rgba(96,35,10,.22)!important}
+ .nav-tools{gap:7px!important;justify-content:flex-end!important}
+ .header-clock-box{height:58px!important;min-width:0!important;width:100%!important;padding:5px 7px!important;gap:7px!important;border:2px solid rgba(255,255,255,.95)!important;border-radius:31px!important;background:rgba(255,255,255,.98)!important;box-shadow:0 8px 20px rgba(90,35,12,.15)!important}
+ .header-clock-box .clock-icon{width:38px!important;height:38px!important;border-radius:50%!important;background:linear-gradient(145deg,#fff,#eee)!important;color:#8d8d8d!important;font-size:1.15rem!important;box-shadow:inset 0 1px 3px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.10)!important}
+ .header-clock{color:#6c2b19!important;font-size:.66rem!important;min-width:0!important;flex:1!important;font-weight:900!important;line-height:1.25!important;text-align:center!important;letter-spacing:.1px!important}
+ .lang-select-wrap{position:relative!important;height:58px!important;width:100%!important;min-width:0!important;padding:0 9px!important;gap:5px!important;border:2px solid rgba(255,255,255,.95)!important;border-radius:31px!important;background:rgba(255,255,255,.98)!important;box-shadow:0 8px 20px rgba(90,35,12,.15)!important;justify-content:center!important}
+ .lang-flag{font-size:1.18rem!important}
+ .lang-select{appearance:none!important;-webkit-appearance:none!important;width:72px!important;max-width:72px!important;color:#7a301c!important;background:transparent!important;font-size:.72rem!important;font-weight:900!important;padding:0 12px 0 0!important;white-space:nowrap!important}
+ .lang-select-wrap:after{content:'⌄';position:absolute;right:9px;top:50%;transform:translateY(-56%);color:#6b2b18;font-size:.85rem;font-weight:900;pointer-events:none}
+ .hero-food-wrap{width:min(330px,88vw)!important;margin:16px auto 0!important}
+ .hero-food{object-fit:cover!important}
+}
+@media(max-width:390px){
+ .nav-shell{grid-template-columns:28% 38% 34%!important}
+ .mobile-header-logo{width:78px!important;height:78px!important}
+ .header-clock-box,.lang-select-wrap{height:54px!important}
+ .header-clock-box .clock-icon{width:35px!important;height:35px!important;font-size:1rem!important}
+ .header-clock{font-size:.60rem!important}
+ .lang-select{font-size:.67rem!important;width:68px!important;max-width:68px!important}
+}
+</style>
+<style>
+/* ═══════════════════════════════════════
+   FINAL MOBILE HOME — matched to reference
+═══════════════════════════════════════ */
+.brand-logo{width:78px;height:78px;object-fit:contain;border-radius:50%;background:#fff;box-shadow:0 6px 18px rgba(80,30,10,.22);flex:0 0 auto}
+@media (max-width: 760px){
+  html,body{width:100%;overflow-x:hidden}
+  body{padding-bottom:104px;background:linear-gradient(180deg,#fff5ed 0%,#fffaf7 42%,#f7f3ef 100%)}
+  header.main-header{padding:0 12px 34px;background:linear-gradient(135deg,#ff4f16 0%,#ff6a32 52%,#ff8a54 100%);border-radius:0 0 34px 34px;box-shadow:0 10px 30px rgba(239,83,24,.18)}
+  header.main-header:before{width:280px;height:280px;top:-150px;right:-100px;background:rgba(255,255,255,.09)}
+  header.main-header:after{width:190px;height:190px;bottom:-120px;left:-90px;background:rgba(255,255,255,.08)}
+  .nav-shell{width:100%;max-width:none;min-height:104px;padding:13px 2px 10px;display:grid!important;grid-template-columns:82px 1fr auto!important;align-items:center;gap:8px}
+  .brand{width:82px;height:82px;display:flex;align-items:center;justify-content:center}
+  .brand-logo{width:78px;height:78px}
+  .brand-name,.main-nav,.share-btn{display:none!important}
+  .nav-tools{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0}
+  .header-clock-box{height:58px!important;min-width:118px;padding:5px 10px!important;display:flex;align-items:center;justify-content:center;gap:7px;border-radius:30px!important;background:#fff!important;border:0!important;color:#6f2b18!important;box-shadow:0 7px 18px rgba(80,30,10,.14);backdrop-filter:none!important}
+  .header-clock-box .clock-icon{width:37px!important;height:37px!important;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f2f2f2;font-size:20px!important;box-shadow:inset 0 1px 2px rgba(0,0,0,.12);flex:0 0 auto}
+  .header-clock{font-size:.68rem!important;line-height:1.32!important;min-width:65px!important;text-align:left!important;color:#6d2a17!important;font-weight:900!important;opacity:1!important}
+  .lang-select-wrap{height:58px!important;min-width:104px;padding:0 8px!important;gap:5px!important;border-radius:30px!important;background:#fff!important;border:0!important;box-shadow:0 7px 18px rgba(80,30,10,.14);color:#6d2a17!important;backdrop-filter:none!important}
+  .lang-flag{font-size:1.18rem;line-height:1}
+  .lang-select{background:transparent!important;color:#6d2a17!important;font-size:.68rem!important;font-weight:900!important;width:70px!important;max-width:70px!important;border:0!important;outline:0!important}
+  .hero-cover{min-height:auto!important;margin:0!important;border-radius:30px!important;overflow:hidden;background:linear-gradient(180deg,#fffaf5 0%,#fff7f0 58%,#fff1e6 100%)!important;box-shadow:0 12px 32px rgba(84,38,18,.16);border:1px solid rgba(255,255,255,.75)}
+  .hero-cover:before{background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.98) 0 30%,rgba(255,239,220,.7) 55%,rgba(255,232,205,.25) 78%,transparent 82%)!important}
+  .hero-content{min-height:auto!important;padding:28px 18px 34px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:0!important}
+  .hero-copy-new{max-width:none!important;text-align:center!important}
+  .hero-eyebrow{padding:8px 18px!important;border-radius:999px!important;background:linear-gradient(135deg,#ff5b21,#f24e1d)!important;color:#fff!important;font-size:.72rem!important;box-shadow:0 7px 16px rgba(245,88,30,.18)!important}
+  .hero-copy-new h1{font-size:clamp(2.35rem,10vw,3.4rem)!important;line-height:1.08!important;margin:17px 0 8px!important;color:#6b2b17!important;letter-spacing:-1.5px!important;text-shadow:0 2px 0 #fff!important}
+  .hero-slogan{font-size:1.15rem!important;line-height:1.45!important;color:#e45628!important;margin-bottom:10px!important;font-weight:900!important}
+  .hero-desc{font-size:.75rem!important;line-height:1.75!important;color:#80685c!important;max-width:330px!important;margin:0 auto!important}
+  .hero-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;margin-top:22px!important}
+  .hero-cta{min-height:58px!important;justify-content:center!important;padding:12px 12px!important;border-radius:30px!important;font-size:.78rem!important;box-shadow:0 7px 18px rgba(80,30,10,.08)}
+  .hero-cta.primary{background:linear-gradient(135deg,#ff5b20,#f84d18)!important;box-shadow:0 9px 20px rgba(245,86,27,.24)!important}
+  .hero-cta.ghost{background:#fff!important;color:#8b3d24!important;border:2px solid #ffd9c7!important}
+  .hero-meta{justify-content:center!important;gap:7px!important;margin-top:17px!important;font-size:.69rem!important;color:#6d5b53!important}
+  .hero-food-wrap{width:min(100%,370px)!important;aspect-ratio:1/1!important;margin:24px auto 0!important}
+  .hero-food-ring{width:94%!important;height:94%!important;background:radial-gradient(circle,#fff 0 46%,#ffdba8 47% 62%,rgba(255,255,255,0) 63%)!important;filter:drop-shadow(0 18px 28px rgba(105,45,15,.12))!important}
+  .hero-food{width:70%!important;height:70%!important;border:9px solid #fff!important;box-shadow:0 16px 38px rgba(83,36,12,.16)!important;transform:none!important}
+  .hero-badge{right:1%;bottom:5%!important;padding:9px 15px!important;font-size:.69rem!important;box-shadow:0 8px 20px rgba(80,30,10,.14)!important}
+  .hero-bottom-wave{display:none!important}
+  .container{max-width:none!important;padding:0 14px!important}
+  .welcome-strip{margin-top:20px!important;border-radius:26px!important;padding:16px!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;background:#fff!important;box-shadow:0 10px 28px rgba(80,40,20,.09)!important}
+  .welcome-item{min-height:78px!important;border-radius:18px!important;padding:10px!important;background:linear-gradient(145deg,#fffdf8,#fff7ec)!important;border:1px solid #f4eadf!important}
+  .install-banner{display:none!important}
+  .slabel{font-size:.72rem!important;margin:22px 2px 11px!important}
+  .otype-wrap{border-radius:18px!important;background:#fff!important}
+  .fields .field-card{border-radius:16px!important}
+  .cat-scroll{margin:0 -14px!important;padding:0 14px!important}
+}
+@media (max-width:390px){
+  .nav-shell{grid-template-columns:72px 1fr auto!important;gap:5px!important}
+  .brand,.brand-logo{width:68px!important;height:68px!important}
+  .header-clock-box{min-width:106px!important;height:54px!important}
+  .lang-select-wrap{min-width:94px!important;height:54px!important}
+  .lang-select{width:61px!important;max-width:61px!important;font-size:.63rem!important}
+  .hero-content{padding:25px 14px 30px!important}
+  .hero-copy-new h1{font-size:2.15rem!important}
+  .hero-slogan{font-size:1.02rem!important}
+  .hero-actions{gap:8px!important}
+  .hero-cta{font-size:.72rem!important}
+  .hero-food-wrap{margin-top:20px!important}
+}
+</style>
+
+<style id="reference-image-final-style">
+@media (max-width:760px){
+  :root{
+    --ref-orange:#ff5a16;
+    --ref-orange2:#ff7a2f;
+    --ref-cream:#fff7ed;
+    --ref-cream2:#fff0dc;
+    --ref-brown:#6c2b18;
+    --ref-line:#f6a46d;
+  }
+
+  html,body{background:#ff7a2f!important;color:var(--ref-brown)!important}
+  body{
+    min-width:0!important;
+    padding-bottom:112px!important;
+    background:
+      radial-gradient(circle at 8% 18%,rgba(255,240,190,.24) 0 3%,transparent 3.5%),
+      radial-gradient(circle at 92% 25%,rgba(255,240,190,.20) 0 4%,transparent 4.5%),
+      linear-gradient(145deg,#ff5314 0%,#ff681d 38%,#ff873b 100%)!important;
+    overflow-x:hidden!important;
+  }
+
+  /* orange reference header */
+  header.main-header{
+    position:relative!important;
+    margin:0!important;
+    padding:9px 14px 22px!important;
+    border-radius:0 0 34px 34px!important;
+    background:
+      radial-gradient(circle at 15% 70%,rgba(255,238,183,.22) 0 2%,transparent 2.5%),
+      radial-gradient(circle at 82% 25%,rgba(255,242,191,.20) 0 3%,transparent 3.5%),
+      linear-gradient(135deg,#ff4f12 0%,#ff651e 50%,#ff8b42 100%)!important;
+    box-shadow:0 12px 28px rgba(112,38,8,.18)!important;
+    overflow:hidden!important;
+  }
+  header.main-header:before{
+    content:"";position:absolute!important;inset:-35% -15% auto auto!important;
+    width:120%!important;height:120%!important;
+    background:
+      radial-gradient(ellipse at 20% 70%,rgba(255,245,207,.13) 0 8%,transparent 8.5%),
+      radial-gradient(ellipse at 65% 35%,rgba(255,245,207,.10) 0 10%,transparent 10.5%);
+    transform:rotate(-7deg)!important;pointer-events:none!important;
+  }
+  header.main-header:after{
+    content:"✿   ❀   ✿";position:absolute!important;
+    right:-4px!important;bottom:2px!important;
+    width:auto!important;height:auto!important;
+    background:none!important;color:rgba(255,245,211,.48)!important;
+    font-size:30px!important;letter-spacing:18px!important;
+    pointer-events:none!important;transform:rotate(-8deg)!important;
+  }
+
+  .nav-shell{
+    position:relative!important;z-index:3!important;
+    min-height:112px!important;
+    width:100%!important;
+    padding:8px 0 4px!important;
+    display:grid!important;
+    grid-template-columns:82px minmax(0,1fr) minmax(108px,1.05fr)!important;
+    align-items:center!important;
+    gap:8px!important;
+  }
+
+  .brand,.brand-logo{
+    width:78px!important;height:78px!important;
+  }
+  .brand{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+  }
+  .brand-logo{
+    border-radius:50%!important;
+    background:#fff!important;
+    border:4px solid rgba(255,255,255,.95)!important;
+    box-shadow:0 7px 18px rgba(76,27,7,.25)!important;
+    object-fit:contain!important;
+  }
+
+  .nav-tools{
+    display:contents!important;
+  }
+  .header-clock-box{
+    height:58px!important;
+    min-width:0!important;
+    width:100%!important;
+    padding:5px 10px 5px 6px!important;
+    gap:7px!important;
+    border-radius:32px!important;
+    background:#fff!important;
+    border:2px solid rgba(255,255,255,.95)!important;
+    color:var(--ref-brown)!important;
+    box-shadow:0 8px 20px rgba(74,27,8,.16)!important;
+  }
+  .header-clock-box .clock-icon{
+    width:40px!important;height:40px!important;
+    border-radius:50%!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    background:#fff!important;color:#777!important;
+    font-size:22px!important;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.08)!important;
+    flex:0 0 auto!important;
+  }
+  .header-clock{
+    color:#672817!important;
+    font-size:.67rem!important;
+    min-width:0!important;
+    flex:1!important;
+    text-align:center!important;
+    font-weight:900!important;
+    line-height:1.25!important;
+    opacity:1!important;
+  }
+
+  .lang-select-wrap{
+    position:relative!important;
+    height:58px!important;
+    min-width:0!important;
+    width:100%!important;
+    padding:7px 9px!important;
+    gap:5px!important;
+    justify-content:center!important;
+    border-radius:32px!important;
+    background:#fff!important;
+    border:2px solid rgba(255,255,255,.95)!important;
+    box-shadow:0 8px 20px rgba(74,27,8,.16)!important;
+  }
+  .lang-flag{font-size:1.12rem!important}
+  .lang-select{
+    width:70px!important;max-width:70px!important;
+    color:#6d2a18!important;background:transparent!important;
+    font-size:.68rem!important;font-weight:900!important;
+    border:0!important;outline:0!important;
+    appearance:none!important;-webkit-appearance:none!important;
+  }
+  .lang-select-wrap:after{
+    content:"⌄"!important;position:absolute!important;
+    right:9px!important;top:50%!important;
+    transform:translateY(-55%)!important;
+    color:#6b2b18!important;font-size:18px!important;font-weight:900!important;
+    pointer-events:none!important;
+  }
+
+  /* main cream card */
+  .hero-cover{
+    position:relative!important;
+    z-index:2!important;
+    margin:0 12px!important;
+    min-height:auto!important;
+    border-radius:34px!important;
+    overflow:hidden!important;
+    background:
+      radial-gradient(circle at 12% 15%,rgba(255,214,147,.25) 0 2%,transparent 2.5%),
+      radial-gradient(circle at 88% 19%,rgba(255,214,147,.22) 0 2%,transparent 2.5%),
+      linear-gradient(180deg,#fff9f1 0%,#fff5e9 52%,#fff0dc 100%)!important;
+    border:2px solid rgba(255,255,255,.82)!important;
+    box-shadow:0 16px 34px rgba(93,35,12,.20)!important;
+  }
+  .hero-cover:before{
+    content:"❀        ✿                 ❀";position:absolute!important;
+    inset:18px 0 auto 0!important;
+    height:110px!important;width:100%!important;
+    background:none!important;
+    color:rgba(241,151,57,.24)!important;
+    font-size:30px!important;
+    letter-spacing:10px!important;
+    text-align:center!important;
+    pointer-events:none!important;
+    z-index:1!important;
+  }
+
+  .hero-content{
+    position:relative!important;z-index:3!important;
+    min-height:auto!important;
+    padding:25px 18px 18px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    gap:0!important;
+  }
+  .hero-copy-new{text-align:center!important;max-width:none!important}
+  .hero-eyebrow{
+    padding:9px 20px!important;
+    border-radius:999px!important;
+    background:linear-gradient(135deg,#ff641f,#f45119)!important;
+    color:#fff!important;
+    font-size:.70rem!important;
+    box-shadow:0 8px 18px rgba(243,80,24,.18)!important;
+  }
+  .hero-copy-new h1{
+    font-size:clamp(2.35rem,10.4vw,3.45rem)!important;
+    line-height:1.04!important;
+    margin:15px 0 7px!important;
+    color:#6a2917!important;
+    font-weight:900!important;
+    letter-spacing:-1.8px!important;
+    text-shadow:2px 2px 0 #fff,0 0 8px rgba(255,255,255,.65)!important;
+  }
+  .hero-slogan{
+    font-size:1.22rem!important;
+    line-height:1.35!important;
+    color:#e95725!important;
+    font-weight:900!important;
+    margin-bottom:10px!important;
+  }
+  .hero-desc{
+    max-width:330px!important;
+    margin:0 auto!important;
+    font-size:.74rem!important;
+    line-height:1.7!important;
+    color:#806a5e!important;
+  }
+
+  .hero-actions{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:10px!important;
+    margin-top:20px!important;
+  }
+  .hero-cta{
+    min-height:60px!important;
+    padding:11px 12px!important;
+    border-radius:32px!important;
+    justify-content:center!important;
+    font-size:.78rem!important;
+    font-weight:900!important;
+  }
+  .hero-cta.primary{
+    background:linear-gradient(135deg,#ff651e,#f84c17)!important;
+    box-shadow:0 10px 22px rgba(245,82,23,.27)!important;
+  }
+  .hero-cta.ghost{
+    background:#fff!important;
+    color:#78331f!important;
+    border:2px solid #ffc9ae!important;
+    box-shadow:0 8px 18px rgba(110,45,18,.08)!important;
+  }
+
+  .hero-meta{
+    margin-top:18px!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr 1fr!important;
+    gap:0!important;
+    width:100%!important;
+    color:#6e4a3b!important;
+    font-size:.68rem!important;
+    font-weight:800!important;
+  }
+  .hero-meta>*{
+    min-width:0!important;
+    text-align:center!important;
+    padding:4px 6px!important;
+    border-right:1px solid rgba(232,116,53,.38)!important;
+  }
+  .hero-meta>*:last-child{border-right:0!important}
+
+  .hero-food-wrap{
+    width:min(100%,390px)!important;
+    aspect-ratio:1/1!important;
+    margin:12px auto 0!important;
+  }
+  .hero-food-ring{
+    width:94%!important;height:94%!important;
+    background:radial-gradient(circle,#fff 0 45%,#ffdba7 46% 61%,transparent 62%)!important;
+    filter:drop-shadow(0 18px 30px rgba(104,45,15,.13))!important;
+  }
+  .hero-food{
+    width:76%!important;height:76%!important;
+    object-fit:cover!important;
+    border:8px solid #fff!important;
+    box-shadow:0 18px 40px rgba(83,36,12,.18)!important;
+    transform:none!important;
+  }
+  .hero-badge{
+    right:0!important;bottom:6%!important;
+    background:#fff!important;
+    color:#78331f!important;
+    padding:9px 15px!important;
+    border-radius:999px!important;
+    box-shadow:0 9px 22px rgba(80,30,10,.15)!important;
+  }
+
+  /* lower cream feature panel */
+  .welcome-strip{
+    position:relative!important;
+    z-index:3!important;
+    margin:18px 12px 0!important;
+    border-radius:30px!important;
+    padding:14px 10px!important;
+    display:grid!important;
+    grid-template-columns:repeat(4,1fr)!important;
+    gap:0!important;
+    background:rgba(255,251,245,.98)!important;
+    border:2px solid rgba(255,255,255,.85)!important;
+    box-shadow:0 10px 28px rgba(78,32,13,.13)!important;
+  }
+  .welcome-item{
+    min-height:88px!important;
+    border-right:1px solid rgba(232,116,53,.35)!important;
+    padding:7px 5px!important;
+    background:transparent!important;
+  }
+  .welcome-item:last-child{border-right:0!important}
+  .welcome-item>span{
+    width:43px!important;height:43px!important;
+    margin:0 auto 5px!important;
+    border-radius:50%!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    background:linear-gradient(145deg,#fff4d8,#ffe5bd)!important;
+    box-shadow:0 5px 12px rgba(242,136,52,.14)!important;
+    font-size:1.25rem!important;
+  }
+  .welcome-item b{
+    display:block!important;
+    font-size:.62rem!important;
+    color:#71301c!important;
+    text-align:center!important;
+  }
+  .welcome-item small{
+    display:block!important;
+    margin-top:2px!important;
+    font-size:.50rem!important;
+    color:#96786a!important;
+    text-align:center!important;
+  }
+
+  /* keep menu/order sections visually consistent */
+  .container{padding-left:12px!important;padding-right:12px!important}
+  .slabel{color:#71301c!important}
+  .card,.menu-card,.sum-card,.fields,.otype-wrap{
+    border-color:#f2dfd2!important;
+  }
+
+  /* bottom navigation/cart stays cream, not black */
+  .sticky-bar{
+    background:rgba(255,250,244,.97)!important;
+    border-top:2px solid rgba(239,128,61,.20)!important;
+    box-shadow:0 -10px 28px rgba(82,33,11,.14)!important;
+    backdrop-filter:blur(16px)!important;
+    -webkit-backdrop-filter:blur(16px)!important;
+  }
+
+  @media(max-width:390px){
+    .nav-shell{grid-template-columns:70px minmax(0,1fr) minmax(96px,1.05fr)!important;gap:5px!important}
+    .brand,.brand-logo{width:67px!important;height:67px!important}
+    .header-clock-box,.lang-select-wrap{height:54px!important}
+    .header-clock-box .clock-icon{width:35px!important;height:35px!important;font-size:19px!important}
+    .header-clock{font-size:.59rem!important}
+    .lang-select{width:61px!important;max-width:61px!important;font-size:.61rem!important}
+    .hero-cover{margin:0 9px!important;border-radius:30px!important}
+    .hero-content{padding:23px 13px 14px!important}
+    .hero-copy-new h1{font-size:2.12rem!important}
+    .hero-slogan{font-size:1.02rem!important}
+    .hero-actions{gap:8px!important}
+    .hero-cta{min-height:55px!important;font-size:.70rem!important}
+    .welcome-strip{margin-left:9px!important;margin-right:9px!important}
+    .welcome-item b{font-size:.57rem!important}
+    .welcome-item small{font-size:.46rem!important}
+  }
+}
+</style>
+
+
+<style id="one-logo-mainpage-final">
+@media (max-width:760px){
+  /* Header: remove the top logo completely. Only clock + language remain. */
+  .main-header .brand{
+    display:none!important;
+  }
+  .main-header .nav-shell{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:10px!important;
+    min-height:78px!important;
+    padding:8px 12px 12px!important;
+  }
+  .main-header .nav-tools{
+    display:contents!important;
+  }
+  .main-header .header-clock-box{
+    grid-column:1!important;
+    width:100%!important;
+    height:58px!important;
+  }
+  .main-header .lang-select-wrap{
+    grid-column:2!important;
+    width:100%!important;
+    height:58px!important;
+  }
+
+  /* The ONLY visible logo: moved down into the circular hero-food position. */
+  .hero-food-wrap{
+    width:min(100%,370px)!important;
+    aspect-ratio:1/1!important;
+    margin:18px auto 0!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+  .hero-food-ring{
+    width:94%!important;
+    height:94%!important;
+    border-radius:50%!important;
+    background:radial-gradient(circle,#fff 0 47%,#ffd9a0 48% 62%,rgba(255,255,255,0) 63%)!important;
+    filter:drop-shadow(0 18px 30px rgba(105,45,15,.13))!important;
+  }
+  .hero-food{
+    width:68%!important;
+    height:68%!important;
+    object-fit:contain!important;
+    border-radius:50%!important;
+    border:9px solid #fff!important;
+    background:#fff!important;
+    box-shadow:0 18px 40px rgba(83,36,12,.18)!important;
+    transform:none!important;
+  }
+  .hero-badge{
+    right:2%!important;
+    bottom:6%!important;
+  }
+}
+
+@media (max-width:390px){
+  .main-header .nav-shell{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:7px!important;
+    padding-left:9px!important;
+    padding-right:9px!important;
+  }
+  .main-header .header-clock-box,
+  .main-header .lang-select-wrap{
+    height:54px!important;
+  }
+  .hero-food-wrap{width:min(100%,330px)!important}
+  .hero-food{width:66%!important;height:66%!important}
+}
+
+/* ─── Hide extra order information while browsing a specific menu category ─── */
+.order-extra-section.category-hidden{display:none!important}
+/* ─── Larger order section headings ─── */
+.slabel{font-size:1.08rem !important;font-weight:800;letter-spacing:.2px;margin:26px 0 13px;line-height:1.45}
+.summary-box .sum-header h3{font-size:1.22rem !important;font-weight:800;line-height:1.4}
+@media (max-width:600px){.slabel{font-size:1.05rem !important}.summary-box .sum-header h3{font-size:1.18rem !important}}
+
+
+/* ═══════════════════════════════════════════════
+   FOOTER — ແບບຕາມຮູບອ້າງອີງ
+═══════════════════════════════════════════════ */
+footer{
+  position:relative;
+  background:linear-gradient(135deg,#6b2b16 0%,#7f351b 52%,#5a2412 100%) !important;
+  border:0 !important;
+  border-radius:28px 28px 0 0 !important;
+  padding:42px 18px 30px !important;
+  margin-top:34px !important;
+  text-align:center;
+  color:#fff !important;
+  overflow:hidden;
+  box-shadow:0 -12px 35px rgba(75,31,15,.16);
+}
+
+footer::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.08),transparent 42%);
+  pointer-events:none;
+}
+
+.footer-logo{
+  position:relative;
+  font-size:3.8rem !important;
+  line-height:1;
+  margin:0 0 12px !important;
+  filter:drop-shadow(0 5px 8px rgba(0,0,0,.22));
+}
+
+.footer-name{
+  position:relative;
+  font-size:1.55rem !important;
+  font-weight:900 !important;
+  color:#fff !important;
+  margin-bottom:9px !important;
+  letter-spacing:.1px;
+}
+
+.footer-info{
+  position:relative;
+  font-size:1rem !important;
+  font-weight:600 !important;
+  color:#f8e9df !important;
+  line-height:1.9 !important;
+  margin-bottom:20px !important;
+}
+
+.footer-info a{
+  color:#ffd23f !important;
+  font-size:1.18rem !important;
+  font-weight:900 !important;
+  text-decoration:none;
+}
+
+.footer-hours{
+  position:relative;
+  display:flex !important;
+  width:100% !important;
+  max-width:430px !important;
+  box-sizing:border-box;
+  background:#fffaf7 !important;
+  color:#54251a !important;
+  border-radius:18px !important;
+  padding:16px 20px !important;
+  margin:0 auto 20px !important;
+  gap:8px !important;
+  box-shadow:0 8px 20px rgba(38,15,7,.16);
+}
+
+.fhr{
+  font-size:.98rem !important;
+  font-weight:700 !important;
+}
+
+.fhr-lbl{
+  color:#755041 !important;
+  width:112px !important;
+  font-size:.95rem !important;
+}
+
+.fhr-time{
+  color:#422116 !important;
+  font-size:1rem !important;
+  font-weight:900 !important;
+}
+
+.footer-social{
+  position:relative;
+  gap:12px !important;
+  margin-bottom:20px !important;
+}
+
+.soc-btn{
+  min-height:42px;
+  padding:10px 18px !important;
+  border-radius:999px !important;
+  background:#fffaf7 !important;
+  border:1px solid rgba(255,255,255,.75) !important;
+  color:#54251a !important;
+  font-size:.92rem !important;
+  font-weight:900 !important;
+  box-shadow:0 5px 14px rgba(38,15,7,.12);
+}
+
+.soc-btn:hover{
+  background:#fff !important;
+  border-color:#fff !important;
+  color:#7a2c13 !important;
+}
+
+.soc-btn.wa{
+  background:#f0fff5 !important;
+  border-color:#c7f3d5 !important;
+  color:#116b3a !important;
+}
+
+.footer-copy{
+  position:relative;
+  color:#f5ddd0 !important;
+  font-size:.82rem !important;
+  font-weight:700 !important;
+}
+
+@media(max-width:600px){
+  footer{
+    padding:34px 12px 24px !important;
+    border-radius:22px 22px 0 0 !important;
+  }
+  .footer-logo{font-size:3.1rem !important}
+  .footer-name{font-size:1.25rem !important}
+  .footer-info{font-size:.88rem !important}
+  .footer-info a{font-size:1.05rem !important}
+  .footer-hours{padding:14px 12px !important}
+  .fhr{font-size:.84rem !important}
+  .fhr-lbl{width:88px !important;font-size:.82rem !important}
+  .fhr-time{font-size:.86rem !important}
+  .soc-btn{font-size:.82rem !important;padding:9px 13px !important}
+  .footer-copy{font-size:.72rem !important}
+}
+</style>
+
+<meta name="robots" content="index,follow">
+<meta name="mobile-web-app-capable" content="yes">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     HEADER
+═══════════════════════════════════ -->
+<header class="main-header">
+  <div class="nav-shell">
+    <a class="brand" href="#top" aria-label="Minnie Noodle">
+      <img class="brand-logo" src="assets/logo.webp" alt="Minnie & Tina" />
+    </a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="#top"><span>⌂</span><b data-lo="ໜ້າຫຼັກ" data-th="หน้าหลัก" data-zh="首页" data-vi="Trang chủ" data-en="Home">ໜ້າຫຼັກ</b></a>
+      <a href="#menuGroups"><span>☷</span><b data-lo="ເມນູອາຫານ" data-th="เมนูอาหาร" data-zh="菜单" data-vi="Thực đơn" data-en="Menu">ເມນູອາຫານ</b></a>
+      <a href="#orderType"><span>🛵</span><b data-lo="ສັ່ງອາຫານ" data-th="สั่งอาหาร" data-zh="点餐" data-vi="Đặt món" data-en="Order">ສັ່ງອາຫານ</b></a>
+      <a href="#summary"><span>☎</span><b data-lo="ຕິດຕໍ່" data-th="ติดต่อ" data-zh="联系" data-vi="Liên hệ" data-en="Contact">ຕິດຕໍ່</b></a>
+    </nav>
+    <div class="nav-tools">
+      <div class="header-clock-box" aria-label="Current time"><span class="clock-icon">🕒</span><div id="headerClock" class="header-clock">--<br>--:--:--</div></div>
+      <button class="share-btn" id="shareBtn" onclick="shareApp()" aria-label="ແຊຣ໌">↗</button>
+      <label class="lang-select-wrap" aria-label="Change language">
+        <span class="lang-flag" id="langFlag">🇱🇦</span>
+        <select id="langSelect" class="lang-select" aria-label="Change language">
+          <option value="lo">ພາສາລາວ 🇱🇦</option>
+          <option value="th">ภาษาไทย 🇹🇭</option>
+          <option value="zh">中文 🇨🇳</option>
+          <option value="vi">Tiếng Việt 🇻🇳</option>
+          <option value="en">English 🇬🇧</option>
+        </select>
+      </label>
+    </div>
+  </div>
+  <div class="hero-cover" id="top">
+    <div class="hero-glow hero-glow-a"></div><div class="hero-glow hero-glow-b"></div>
+    <div class="hero-content">
+      <div class="hero-copy-new">
+        <div class="hero-eyebrow" data-lo="ຮ້ານອາຫານຕາມສັ່ງ" data-th="ร้านอาหารตามสั่ง" data-zh="现点现做餐厅" data-vi="Quán ăn gọi món" data-en="Made-to-order restaurant">ຮ້ານອາຫານຕາມສັ່ງ</div>
+        <h1 data-lo="ມິນນີ້ໝີ່ກ້ຽວ" data-th="มินนี่หมี่เกี๊ยว" data-zh="Minnie 面与馄饨" data-vi="Minnie Mì Hoành Thánh" data-en="Minnie Noodle">ມິນນີ້ໝີ່ກ້ຽວ</h1>
+        <p class="hero-slogan" data-lo="ແຊບ ອຸ່ນໃຈ ທຸກເມນູ" data-th="อร่อย อุ่นใจ ทุกเมนู" data-zh="美味暖心，每道用心" data-vi="Ngon ấm lòng, từng món" data-en="Delicious comfort in every dish">ແຊບ ອຸ່ນໃຈ ທຸກເມນູ</p>
+        <p class="hero-desc" data-lo="ຄັດສັນວັດຖຸດິບສົດໃໝ່ ປຸງສົດທຸກຈານ ສັ່ງງ່າຍ ຮັບໄວ" data-th="คัดสรรวัตถุดิบสดใหม่ ปรุงสดทุกจาน สั่งง่าย รับไว" data-zh="精选新鲜食材，每份现做，点餐简单，快速送达" data-vi="Nguyên liệu tươi mới, nấu mới mỗi món, đặt dễ, nhận nhanh" data-en="Fresh ingredients, made to order, easy to order and quick to receive">ຄັດສັນວັດຖຸດິບສົດໃໝ່ ປຸງສົດທຸກຈານ ສັ່ງງ່າຍ ຮັບໄວ</p>
+        <div class="hero-actions">
+          <a class="hero-cta primary" href="#menuGroups"><span>🍜</span><b data-lo="ເລືອກເມນູ" data-th="เลือกเมนู" data-zh="选择菜单" data-vi="Chọn món" data-en="Browse menu">ເລືອກເມນູ</b><i>›</i></a>
+          <a class="hero-cta ghost" href="#summary"><span>🛒</span><b data-lo="ເບິ່ງກະຕ່າ" data-th="ดูกระเป๋า" data-zh="查看购物车" data-vi="Xem giỏ hàng" data-en="View cart">ເບິ່ງກະຕ່າ</b></a>
+        </div>
+        <div class="hero-meta">
+          <span>⭐ 4.9</span><span>•</span><span>⏱ 15–30 ນາທີ</span><span>•</span><span>🛵 ສົ່ງຟຣີ</span>
+        </div>
+      </div>
+      <div class="hero-food-wrap">
+        <div class="hero-food-ring"></div>
+        <img id="heroFood" class="hero-food" alt="Minnie & Tina Logo" src="assets/logo.webp">
+        <div class="hero-badge"><span>♥</span><b data-lo="ແຊບທຸກຈານ" data-th="อร่อยทุกจาน" data-zh="每道都美味" data-vi="Ngon từng món" data-en="Delicious every dish">ແຊບທຸກຈານ</b></div>
+      </div>
+    </div>
+    <div class="hero-bottom-wave"></div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════
+     MAIN CONTAINER
+═══════════════════════════════════ -->
+<div class="container">
+
+  <section class="welcome-strip" aria-label="Welcome">
+    <div class="welcome-item"><span>🌿</span><div><b data-lo="ວັດຖຸດິບສົດໃໝ່" data-th="วัตถุดิบสดใหม่" data-zh="新鲜食材" data-vi="Nguyên liệu tươi" data-en="Fresh ingredients">ວັດຖຸດິບສົດໃໝ່</b><small data-lo="ຄັດສັນທຸກມື້" data-th="คัดสรรทุกวัน" data-zh="每日精选" data-vi="Chọn mỗi ngày" data-en="Selected daily">ຄັດສັນທຸກມື້</small></div></div>
+    <div class="welcome-item"><span>👨‍🍳</span><div><b data-lo="ປຸງສົດທຸກຈານ" data-th="ปรุงสดทุกจาน" data-zh="每份现做" data-vi="Nấu mới mỗi món" data-en="Made fresh">ປຸງສົດທຸກຈານ</b><small data-lo="ລົດຊາດຕົ້ນຕຳຮັບ" data-th="รสชาติต้นตำรับ" data-zh="正宗风味" data-vi="Hương vị đặc trưng" data-en="Authentic taste">ລົດຊາດຕົ້ນຕຳຮັບ</small></div></div>
+    <div class="welcome-item"><span>🚚</span><div><b data-lo="ຮັບໄວ" data-th="รับไว" data-zh="快速配送" data-vi="Giao nhanh" data-en="Fast delivery">ຮັບໄວ</b><small data-lo="ສົ່ງຟຣີ" data-th="ส่งฟรี" data-zh="免费配送" data-vi="Miễn phí" data-en="Free delivery">ສົ່ງຟຣີ</small></div></div>
+    <div class="welcome-item"><span>🛡️</span><div><b data-lo="ປອດໄພ" data-th="ปลอดภัย" data-zh="安心" data-vi="An tâm" data-en="Safe & secure">ປອດໄພ</b><small data-lo="ສັ່ງງ່າຍ ຈ່າຍສະດວກ" data-th="สั่งง่าย จ่ายสะดวก" data-zh="下单方便，支付轻松" data-vi="Đặt dễ, thanh toán tiện" data-en="Easy ordering">ສັ່ງງ່າຍ ຈ່າຍສະດວກ</small></div></div>
+  </section>
+
+  <!-- PWA Install Banner -->
+  <div class="install-banner" id="installBanner">
+    <span class="ib-icon">📲</span>
+    <div class="ib-text">
+      <span data-lo="ຕິດຕັ້ງແອັບໄດ້ທັນທີ!" data-th="ติดตั้งแอปได้เลย!" data-en="Install the app now!">ຕິດຕັ້ງແອັບໄດ້ທັນທີ!</span>
+      <div class="ib-sub" data-lo="ໃຊ້ງານຄືແອັບ ບໍ່ຕ້ອງດາວໂຫຼດ" data-th="ใช้งานเหมือนแอป ไม่ต้องดาวน์โหลด" data-en="Use it like an app — no download required">ໃຊ້ງານຄືແອັບ ບໍ່ຕ້ອງດາວໂຫຼດ</div>
+    </div>
+    <button class="ib-btn" id="installBtn"><span data-lo="ຕິດຕັ້ງ" data-th="ติดตั้ง" data-en="Install">ຕິດຕັ້ງ</span></button>
+  </div>
+
+  <!-- ── ປະເພດການສັ່ງ ── -->
+  <p class="slabel" data-lo="ປະເພດການສັ່ງ" data-zh="订单类型" data-vi="Loại đơn hàng" data-th="ประเภทการสั่ง" data-en="Order Type">ປະເພດການສັ່ງ</p>
+  <div class="otype-wrap" id="orderType">
+    <button class="otype-btn active" id="btnDine"     onclick="setOrderType('dine')">
+      🪑 <span data-lo="ນັ່ງກິນຢູ່ຮ້ານ" data-zh="堂食" data-vi="Ăn tại quán"  data-th="ทานที่ร้าน" data-en="Dine In">ນັ່ງກິນຢູ່ຮ້ານ</span>
+    </button>
+    <button class="otype-btn"        id="btnDelivery" onclick="setOrderType('delivery')">
+      🛵 <span data-lo="ສົ່ງເຖິງບ້ານ" data-zh="送货上门" data-vi="Giao tận nhà" data-th="ส่งถึงบ้าน" data-en="Delivery">ສົ່ງເຖິງບ້ານ</span>
+    </button>
+    <button class="otype-btn"        id="btnPickup"   onclick="setOrderType('pickup')">
+      🥡 <span data-lo="ຮັບດ້ວຍຕົນເອງ" data-zh="到店自取" data-vi="Tự đến nhận"      data-th="รับเอง" data-en="Pickup">ຮັບດ້ວຍຕົນເອງ</span>
+    </button>
+  </div>
+
+  <!-- ── ຂໍ້ມູນຜູ້ສັ່ງ ── -->
+  <p class="slabel" data-lo="ຂໍ້ມູນຜູ້ສັ່ງ" data-zh="顾客信息" data-vi="Thông tin khách hàng" data-th="ข้อมูลผู้สั่ง" data-en="Customer Information">ຂໍ້ມູນຜູ້ສັ່ງ</p>
+  <div class="fields">
+    <div class="field-card">
+      <div class="fc-icon" id="fcIcon">🪑</div>
+      <input type="text" id="customerName" placeholder="ເບີໂຕະ ຫຼື ຊື່ລູກຄ້າ" autocomplete="off">
+    </div>
+    <div class="field-card" id="phoneField" style="display:none">
+      <div class="fc-icon">📞</div>
+      <input type="tel" id="customerPhone" placeholder="ເບີໂທ 020-XXXX-XXXX" autocomplete="tel">
+    </div>
+    <div class="field-card" id="addressField" style="display:none">
+      <div class="fc-icon">📍</div>
+      <input type="text" id="customerAddress" placeholder="ທີ່ຢູ່ ຫຼື ຈຸດສັງເກດ" autocomplete="street-address">
+    </div>
+    <!-- PIN LOCATION BUTTON — shown only when delivery selected -->
+    <div id="pinFieldBlock" style="display:none">
+      <button class="pin-field-btn" id="pinFieldBtn" onclick="pinFieldGetLocation()" type="button">
+        <span class="pfb-icon" id="pinFieldIcon">🎯</span>
+        <div class="pfb-text">
+          <span id="pinFieldLabel">ກົດທີ່ນີ້ເພື່ອປັກໝຸດຕຳແໜ່ງຂອງຂ້ອຍ</span>
+          <span class="pfb-sub" id="pinFieldSub">ລະບົບຈະດຶງ GPS ຂອງໂທລະສັບທ່ານອັດຕະໂນມັດ</span>
+        </div>
+        <span class="pfb-arrow" id="pinFieldArrow">›</span>
+      </button>
+      <div class="pin-field-status" id="pinFieldStatus" style="display:none">
+        <span id="pinFieldStatusIcon">✅</span>
+        <div>
+          <div id="pinFieldStatusText"></div>
+          <div class="pin-field-coords" id="pinFieldCoords"></div>
+        </div>
+        <button class="pfb-clear" onclick="pinFieldClear()" type="button" aria-label="ລຶບຕຳແໜ່ງ">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ເລືອກເມນູ ── -->
+  <p class="slabel" data-lo="ເລືອກເມນູ" data-zh="选择菜单" data-vi="Chọn món" data-th="เลือกเมนู" data-en="Choose Menu">ເລືອກເມນູ</p>
+  <div class="cat-scroll">
+    <div class="cat-tabs">
+      <button class="cat-tab active" onclick="filterCat('all',this)">🍽 <span data-lo="ທັງໝົດ" data-zh="全部" data-vi="Tất cả" data-th="ทั้งหมด" data-en="All">ທັງໝົດ</span></button>
+      <button class="cat-tab" onclick="filterCat('soup',this)">🍲 <span data-lo="ແກງ" data-th="ซุป" data-en="Soups">ແກງ</span></button>
+      <button class="cat-tab" onclick="filterCat('friedrice',this)">🍚 <span data-lo="ເຂົ້າຜັດ" data-th="ข้าวผัด" data-en="Fried Rice">ເຂົ້າຜັດ</span></button>
+      <button class="cat-tab" onclick="filterCat('noodles',this)">🍜 <span data-lo="ຜັດເສັ້ນ" data-th="ผัดเส้น" data-en="Noodles">ຜັດເສັ້ນ</span></button>
+      <button class="cat-tab" onclick="filterCat('noodledish',this)">🥣 <span data-lo="ໝີ່ກ້ຽວ" data-th="เมนูเส้น" data-en="Noodle Dishes">ໝີ່ກ້ຽວ</span></button>
+      <button class="cat-tab" onclick="filterCat('rice',this)">🍛 <span data-lo="ເຂົ້າລາດໜ້າ" data-th="เมนูราดข้าว" data-en="Rice Dishes">ເຂົ້າລາດໜ້າ</span></button>
+      <button class="cat-tab" onclick="filterCat('dimsum',this)">🥟 <span data-lo="ຕິ່ມຊຳ" data-th="ติ่มซำ" data-en="Dim Sum">ຕິ່ມຊຳ</span></button>
+      <button class="cat-tab" onclick="filterCat('extra',this)">🍳 <span data-lo="ເພີ່ມເຕີມ" data-th="เพิ่มเติม" data-en="Extras">ເພີ່ມເຕີມ</span></button>
+    </div>
+  </div>
+
+  <!-- Skeleton loader (shown briefly on first load) -->
+  <div id="skeletonLoader" style="display:none;flex-direction:column;gap:12px;margin-top:14px">
+    <div class="skel-card"><div class="skel-img skeleton"></div><div class="skel-lines"><div class="skel-line w80 skeleton"></div><div class="skel-line w60 skeleton"></div><div class="skel-line w40 skeleton"></div></div></div>
+    <div class="skel-card"><div class="skel-img skeleton"></div><div class="skel-lines"><div class="skel-line w80 skeleton"></div><div class="skel-line w60 skeleton"></div><div class="skel-line w40 skeleton"></div></div></div>
+    <div class="skel-card"><div class="skel-img skeleton"></div><div class="skel-lines"><div class="skel-line w80 skeleton"></div><div class="skel-line w60 skeleton"></div><div class="skel-line w40 skeleton"></div></div></div>
+  </div>
+
+  <!-- ───────── MENU LISTS (generated from Excel) ───────── -->
+  <div id="menuGroups"></div>
+
+  <!-- ── ຄຳຮ້ອງຂໍພິເສດ ── -->
+  <p class="slabel order-extra-section" data-lo="ຄຳຮ້ອງຂໍພິເສດ" data-th="คำขอพิเศษ" data-en="Special Request">ຄຳຮ້ອງຂໍພິເສດ</p>
+  <div class="special-card order-extra-section">
+    <div class="sc-icon">💬</div>
+    <textarea id="specialReq" rows="2" placeholder="ເຊັ່ນ: ບໍ່ໃສ່ຜັກ, ຫຼຸດນ້ຳຕານ, ສົ່ງໄວ..."></textarea>
+  </div>
+
+  <!-- ── ໂປໂມຊັນ ── -->
+  <p class="slabel order-extra-section" data-lo="ໂປໂມຊັນ" data-zh="优惠活动" data-vi="Khuyến mãi" data-th="โปรโมชัน" data-en="Promotion">ໂປໂມຊັນ</p>
+  <div class="promo-card order-extra-section">
+    <div class="pc-icon">🎁</div>
+    <input type="text" id="promoCode" placeholder="ລະຫັດສ່ວນຫຼຸດ" maxlength="20">
+    <button class="promo-apply" onclick="applyPromo()"><span data-lo="ນຳໃຊ້" data-th="ใช้" data-en="Apply">ນຳໃຊ້</span></button>
+  </div>
+  <div class="promo-msg order-extra-section" id="promoMsg"></div>
+
+  <!-- ── ວິທີຊຳລະ ── -->
+  <p class="slabel order-extra-section" data-lo="ວິທີຊຳລະເງິນ" data-zh="付款方式" data-vi="Phương thức thanh toán" data-th="วิธีชำระเงิน" data-en="Payment Method">ວິທີຊຳລະເງິນ</p>
+  <div class="pay-grid order-extra-section">
+    <button class="pay-btn active" id="pay-cash"     onclick="setPayment('cash')">
+      <span class="picon">💵</span><span data-lo="ເງິນສົດ" data-zh="现金" data-vi="Tiền mặt" data-th="เงินสด" data-en="Cash">ເງິນສົດ</span>
+    </button>
+    <button class="pay-btn"        id="pay-bcel"     onclick="setPayment('bcel')">
+      <span class="picon">🏦</span>BCEL One
+    </button>
+  </div>
+  <div class="qr-hint order-extra-section" id="qrHint" onclick="openQrModal()">
+    <span style="font-size:1.8rem">📲</span>
+    <div>
+      <div class="qr-hint-text">ກົດເພື່ອເບິ່ງ QR Code ຊຳລະ</div>
+      <div class="qr-hint-sub">BCEL One</div>
+    </div>
+    <span style="color:var(--primary);font-size:1.3rem;margin-left:auto">›</span>
+  </div>
+
+  <!-- ── ສະຫຼຸບລາຍການ ── -->
+  <div class="summary-box" id="summary">
+    <div class="sum-header">
+      <h3>ສະຫຼຸບລາຍການ</h3>
+      <span class="sum-count" id="sumCount">0 ລາຍການ</span>
+    </div>
+    <div class="sum-rows" id="sumRows"></div>
+    <div class="empty-hint" id="emptyHint">
+      <span class="ei">🛒</span>
+      ຍັງບໍ່ທັນເລືອກເມນູ — ກົດ + ເພື່ອເລີ່ມສັ່ງ
+    </div>
+    <hr class="divider">
+    <div class="fee-row" id="feeRow" style="display:none">
+      <span>🛵 ຄ່າສົ່ງ</span>
+      <span class="fv" id="feeVal">ຟຣີ</span>
+    </div>
+    <div class="disc-row" id="discRow">
+      <span>🎁 ສ່ວນຫຼຸດ</span>
+      <span class="fv" id="discVal">-0 ກີບ</span>
+    </div>
+    <div class="total-row">
+      <span class="total-lbl">💰 ລາຄາລວມ</span>
+      <div class="total-wrap">
+        <span class="total-amt" id="total">0</span>
+        <span class="total-cur"> ກີບ</span>
+      </div>
+    </div>
+    <!-- min order warning -->
+    <div class="min-order-warn" id="minWarn">
+      ⚠️ ສັ່ງຂັ້ນຕ່ຳ 30,000 ກີບ — ກະລຸນາເພີ່ມລາຍການ
+    </div>
+    <!-- summary actions -->
+    <div class="summary-actions">
+      <button class="print-btn" onclick="printReceipt()">🖨️ ພິມໃບບິນ</button>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+
+<!-- Menu photo viewer -->
+<div class="photo-viewer" id="photoViewer" role="dialog" aria-modal="true" aria-label="Menu photo">
+  <div class="photo-viewer-inner">
+    <button class="photo-viewer-close" type="button" onclick="closePhotoViewer()" aria-label="Close">×</button>
+    <img class="photo-viewer-img" id="photoViewerImg" src="" alt="">
+    <div class="photo-viewer-title" id="photoViewerTitle"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     FOOTER
+═══════════════════════════════════ -->
+<footer>
+  <div class="footer-logo">🍜</div>
+  <div class="footer-name">ຮ້ານ ມິນນີ້ ໝີ່ກ້ຽວ</div>
+  <div class="footer-info">
+    📍 ຖະໜົນ ເລກ 9, ແດນສະຫວັນ<br>
+    📞 <a href="tel:02092392253">02092392253</a>
+  </div>
+  <div class="footer-hours">
+    <div class="fhr"><span class="dot"></span><span class="fhr-lbl">ຈັນ – ອາທິດ</span><span class="fhr-time">07:00 – 18:00</span></div>
+     <div class="fhr"><span class="dot off"></span><span class="fhr-lbl">ວັນຫຍຸດ</span><span class="fhr-time" style="color:var(--muted)">ປິດ</span></div>
+  </div>
+  <div class="footer-social">
+    <a href="https://wa.me/8562092392253" class="soc-btn wa" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <circle cx="16" cy="16" r="16" fill="#25D366"/>
+        <path d="M22.5 9.5C21.1 8.1 19.2 7.2 17 7C12.5 7 8.9 10.6 8.9 15.1C8.9 16.6 9.3 18 10 19.2L8.8 23.3L13.1 22.1C14.3 22.8 15.6 23.1 17 23.1C21.5 23.1 25.1 19.5 25.1 15C25.1 12.8 24.2 10.9 22.5 9.5ZM17 21.7C15.7 21.7 14.5 21.4 13.4 20.8L13.1 20.6L10.6 21.3L11.3 18.8L11.1 18.5C10.5 17.4 10.2 16.3 10.2 15.1C10.2 11.3 13.2 8.3 17 8.3C18.9 8.3 20.6 9 21.9 10.3C23.2 11.6 23.8 13.3 23.8 15.1C23.8 18.9 20.8 21.7 17 21.7ZM20.8 16.7C20.6 16.6 19.5 16.1 19.3 16C19.1 15.9 19 15.9 18.8 16.1C18.6 16.3 18.2 16.7 18.1 16.9C18 17.1 17.8 17.1 17.6 17C16.5 16.5 15.8 16 15.1 14.9C14.9 14.6 15.2 14.6 15.4 14.1C15.5 14 15.4 13.9 15.4 13.8C15.4 13.7 14.9 12.6 14.7 12.2C14.5 11.8 14.3 11.8 14.1 11.8H13.8C13.6 11.8 13.4 11.9 13.2 12.1C13 12.3 12.5 12.8 12.5 13.9C12.5 15 13.3 16.1 13.4 16.2C13.5 16.4 14.9 18.5 17 19.4C18.6 20.1 19.3 20.1 20.1 20C20.6 19.9 21.6 19.4 21.8 18.9C22 18.4 22 17.9 21.9 17.8C21.8 17.7 21.6 17.6 21.4 17.5L20.8 16.7Z" fill="white"/>
+      </svg>
+      WhatsApp
+    </a>
+    <a href="tel:02092392253" class="soc-btn">📞 ໂທຫາຮ້ານ</a>
+    <a href="https://maps.google.com/?q=ຖະໜົນທາດຫຼວງ,ວຽງຈັນ,ລາວ" class="soc-btn maps-link" target="_blank" rel="noopener">📍 ເບິ່ງແຜນທີ່</a>
+  </div>
+  <div class="footer-copy">© 2026 ມິນນີ້ໝີ່ກ້ຽວ · ສ້າງດ້ວຍ ❤️ ໃນ ລາວ</div>
+</footer>
+
+<!-- ═══════════════════ BACK TO TOP ═══════════════════ -->
+<button class="btt-btn" id="bttBtn" onclick="scrollToTop()" aria-label="ກັບຂຶ້ນເທິງ">↑</button>
+
+<!-- ═══════════════════════════════════
+     STICKY BAR
+═══════════════════════════════════ -->
+<div class="sticky-bar" id="stickyBar">
+  <div class="sticky-info">
+    <div class="sticky-count" id="stickyCount">0 ລາຍການ</div>
+    <div class="sticky-total"><span id="stickyTotal">0</span> ກີບ</div>
+  </div>
+  <button class="sbtn sbtn-cart" id="cartBtn" onclick="openCartDrawer()">
+    🛒 ຕະກ້າ
+  </button>
+  <button class="sbtn sbtn-clear" id="clearOrderBtn" onclick="clearCurrentOrder()" type="button">
+    🗑️ <span data-lo="ເຄຍອໍເດີ້" data-th="ล้างออเดอร์" data-zh="清空订单" data-vi="Xóa đơn" data-en="Clear order">ເຄຍອໍເດີ້</span>
+  </button>
+  <button class="sbtn sbtn-wa" id="sendBtn" onclick="sendOrder()">
+    <span class="cart-badge" id="cartBadge"></span>
+    <svg width="18" height="18" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <circle cx="16" cy="16" r="16" fill="#128C7E"/>
+      <path d="M22.5 9.5C21.1 8.1 19.2 7.2 17 7C12.5 7 8.9 10.6 8.9 15.1C8.9 16.6 9.3 18 10 19.2L8.8 23.3L13.1 22.1C14.3 22.8 15.6 23.1 17 23.1C21.5 23.1 25.1 19.5 25.1 15C25.1 12.8 24.2 10.9 22.5 9.5ZM17 21.7C15.7 21.7 14.5 21.4 13.4 20.8L13.1 20.6L10.6 21.3L11.3 18.8L11.1 18.5C10.5 17.4 10.2 16.3 10.2 15.1C10.2 11.3 13.2 8.3 17 8.3C18.9 8.3 20.6 9 21.9 10.3C23.2 11.6 23.8 13.3 23.8 15.1C23.8 18.9 20.8 21.7 17 21.7ZM20.8 16.7C20.6 16.6 19.5 16.1 19.3 16C19.1 15.9 19 15.9 18.8 16.1C18.6 16.3 18.2 16.7 18.1 16.9C18 17.1 17.8 17.1 17.6 17C16.5 16.5 15.8 16 15.1 14.9C14.9 14.6 15.2 14.6 15.4 14.1C15.5 14 15.4 13.9 15.4 13.8C15.4 13.7 14.9 12.6 14.7 12.2C14.5 11.8 14.3 11.8 14.1 11.8H13.8C13.6 11.8 13.4 11.9 13.2 12.1C13 12.3 12.5 12.8 12.5 13.9C12.5 15 13.3 16.1 13.4 16.2C13.5 16.4 14.9 18.5 17 19.4C18.6 20.1 19.3 20.1 20.1 20C20.6 19.9 21.6 19.4 21.8 18.9C22 18.4 22 17.9 21.9 17.8C21.8 17.7 21.6 17.6 21.4 17.5L20.8 16.7Z" fill="white"/>
+    </svg>
+    ສົ່ງອໍເດີ
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════
+     CART DRAWER
+═══════════════════════════════════ -->
+<div class="overlay" id="drawerOverlay" onclick="closeCartDrawer()"></div>
+<div class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-label="ຕະກ້າສິນຄ້າ">
+  <div class="drag-handle"></div>
+  <div class="drawer-head">
+    <span class="drawer-title">🛒 ຕະກ້າສິນຄ້າ</span>
+    <button class="drawer-close" onclick="closeCartDrawer()" aria-label="ປິດ">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot">
+    <div class="drawer-total">
+      <span class="dt-lbl">💰 ລວມທັງໝົດ</span>
+      <span class="dt-amt"><span id="drawerTotal">0</span> ກີບ</span>
+    </div>
+    <button class="drawer-send" onclick="closeCartDrawer();sendOrder()">
+      <svg width="18" height="18" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <circle cx="16" cy="16" r="16" fill="#128C7E"/>
+        <path d="M22.5 9.5C21.1 8.1 19.2 7.2 17 7C12.5 7 8.9 10.6 8.9 15.1C8.9 16.6 9.3 18 10 19.2L8.8 23.3L13.1 22.1C14.3 22.8 15.6 23.1 17 23.1C21.5 23.1 25.1 19.5 25.1 15C25.1 12.8 24.2 10.9 22.5 9.5ZM17 21.7C15.7 21.7 14.5 21.4 13.4 20.8L13.1 20.6L10.6 21.3L11.3 18.8L11.1 18.5C10.5 17.4 10.2 16.3 10.2 15.1C10.2 11.3 13.2 8.3 17 8.3C18.9 8.3 20.6 9 21.9 10.3C23.2 11.6 23.8 13.3 23.8 15.1C23.8 18.9 20.8 21.7 17 21.7ZM20.8 16.7C20.6 16.6 19.5 16.1 19.3 16C19.1 15.9 19 15.9 18.8 16.1C18.6 16.3 18.2 16.7 18.1 16.9C18 17.1 17.8 17.1 17.6 17C16.5 16.5 15.8 16 15.1 14.9C14.9 14.6 15.2 14.6 15.4 14.1C15.5 14 15.4 13.9 15.4 13.8C15.4 13.7 14.9 12.6 14.7 12.2C14.5 11.8 14.3 11.8 14.1 11.8H13.8C13.6 11.8 13.4 11.9 13.2 12.1C13 12.3 12.5 12.8 12.5 13.9C12.5 15 13.3 16.1 13.4 16.2C13.5 16.4 14.9 18.5 17 19.4C18.6 20.1 19.3 20.1 20.1 20C20.6 19.9 21.6 19.4 21.8 18.9C22 18.4 22 17.9 21.9 17.8C21.8 17.7 21.6 17.6 21.4 17.5L20.8 16.7Z" fill="white"/>
+      </svg>
+      ສົ່ງ WhatsApp
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     QR MODAL
+═══════════════════════════════════ -->
+<div class="modal-ov" id="qrOv" onclick="handleQrOvClick(event)">
+  <div class="qr-modal" role="dialog" aria-modal="true" aria-label="QR Code ຊຳລະ">
+    <div class="modal-handle"></div>
+    <div class="modal-head">
+      <span class="modal-title">💳 ຊຳລະດ້ວຍ QR</span>
+      <button class="modal-close" onclick="closeQrModal()" aria-label="ປິດ">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="mtab active" onclick="switchQrTab('bcel',this)">🏦 BCEL</button>
+    </div>
+    <div class="modal-body">
+      <div class="qr-box">
+        <span class="qi" id="qrIcon">🏦</span>
+        <span class="ql" id="qrLabel">BCEL One</span>
+      </div>
+      <div class="qr-bank" id="qrBank">ທະນາຄານ BCEL</div>
+      <div class="qr-acc"  id="qrAcc">ເລກບັນຊີ: 0001-023-456789-01</div>
+      <div class="qr-amt-box">
+        <div class="qra-lbl">ຍອດທີ່ຕ້ອງໂອນ</div>
+        <div class="qra-val"><span id="qrAmt">0</span> ກີບ</div>
+      </div><br>
+      <button class="copy-btn" onclick="copyAcc()">📋 ຄັດລອກເລກບັນຊີ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ ORDER HISTORY ═══════════════════ -->
+<div class="container">
+  <p class="slabel" id="histLabel" onclick="openHistModal()" style="cursor:pointer;user-select:none">
+    🕐 ປະຫວັດການສັ່ງ <span style="font-size:.65rem;color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none">(ກົດເພື່ອເບິ່ງ 🔒)</span>
+  </p>
+  <div id="histContentBox" style="display:none">
+    <div class="history-wrap" id="historyWrap">
+      <div class="hist-empty" id="histEmpty">
+        <span>📋</span>ຍັງບໍ່ທັນມີປະຫວັດການສັ່ງ
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <button class="hist-clear-btn" id="clearHistBtn" onclick="clearHistory()" style="display:none">
+        🗑 ລຶບປະຫວັດທັງໝົດ
+      </button>
+      <button class="hist-clear-btn" onclick="histLock()">
+        🔒 ລັອກຄືນ
+      </button>
+    </div>
+  </div>
+</div>
+<!-- ═══════════════════════════════════
+     PIN LOCATION MODAL
+═══════════════════════════════════ -->
+<div class="pin-modal-ov" id="pinModalOv" onclick="handlePinOvClick(event)">
+  <div class="pin-modal" role="dialog" aria-modal="true" aria-label="ປັກໝຸດຕຳແໜ່ງ">
+    <div class="pin-modal-handle"></div>
+    <div class="pin-modal-head">
+      <span class="pin-modal-title">📍 ປັກໝຸດຕຳແໜ່ງສົ່ງ</span>
+      <button class="pin-modal-close" onclick="closePinModal()" aria-label="ປິດ">✕</button>
+    </div>
+    <div class="pin-modal-body">
+      <!-- Status -->
+      <div class="pin-status" id="pinStatus">
+        <span class="ps-icon">📡</span>
+        <div>
+          <div id="pinStatusText">ກົດ "ຫາຕຳແໜ່ງຂອງຂ້ອຍ" ເພື່ອແຊຣ໌ Location</div>
+          <div class="pin-coords" id="pinCoords"></div>
+        </div>
+      </div>
+
+      <!-- Map preview (shown after pin) -->
+      <div class="pin-map-box" id="pinMapBox">
+        <div class="pin-map-placeholder" id="pinMapPlaceholder">
+          <span class="pm-icon">🗺️</span>
+          <span>ແຜນທີ່ຈະສະແດງຫຼັງຈາກກົດຫາຕຳແໜ່ງ</span>
+        </div>
+        <iframe id="pinMapFrame" style="display:none"
+          allowfullscreen loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+
+      <!-- Address note -->
+      <textarea class="pin-addr-field" id="pinAddrNote" rows="2"
+        placeholder="ເພີ່ມຈຸດສັງເກດ: ຕຶກສີຂາວ, ຕ່ຳໜ້າຮ້ານ XXX, ຊັ້ນ 2..."></textarea>
+
+      <div class="pin-divider">ຫຼື</div>
+
+      <div class="pin-actions">
+        <button class="pin-btn pin-btn-locate" id="pinLocateBtn" onclick="pinGetLocation()">
+          🎯 ຫາຕຳແໜ່ງຂອງຂ້ອຍ (GPS)
+        </button>
+        <button class="pin-btn pin-btn-send" id="pinSendBtn" onclick="pinConfirmAndSend()" disabled>
+          <svg width="18" height="18" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <circle cx="16" cy="16" r="16" fill="#128C7E"/>
+            <path d="M22.5 9.5C21.1 8.1 19.2 7.2 17 7C12.5 7 8.9 10.6 8.9 15.1C8.9 16.6 9.3 18 10 19.2L8.8 23.3L13.1 22.1C14.3 22.8 15.6 23.1 17 23.1C21.5 23.1 25.1 19.5 25.1 15C25.1 12.8 24.2 10.9 22.5 9.5ZM17 21.7C15.7 21.7 14.5 21.4 13.4 20.8L13.1 20.6L10.6 21.3L11.3 18.8L11.1 18.5C10.5 17.4 10.2 16.3 10.2 15.1C10.2 11.3 13.2 8.3 17 8.3C18.9 8.3 20.6 9 21.9 10.3C23.2 11.6 23.8 13.3 23.8 15.1C23.8 18.9 20.8 21.7 17 21.7ZM20.8 16.7C20.6 16.6 19.5 16.1 19.3 16C19.1 15.9 19 15.9 18.8 16.1C18.6 16.3 18.2 16.7 18.1 16.9C18 17.1 17.8 17.1 17.6 17C16.5 16.5 15.8 16 15.1 14.9C14.9 14.6 15.2 14.6 15.4 14.1C15.5 14 15.4 13.9 15.4 13.8C15.4 13.7 14.9 12.6 14.7 12.2C14.5 11.8 14.3 11.8 14.1 11.8H13.8C13.6 11.8 13.4 11.9 13.2 12.1C13 12.3 12.5 12.8 12.5 13.9C12.5 15 13.3 16.1 13.4 16.2C13.5 16.4 14.9 18.5 17 19.4C18.6 20.1 19.3 20.1 20.1 20C20.6 19.9 21.6 19.4 21.8 18.9C22 18.4 22 17.9 21.9 17.8C21.8 17.7 21.6 17.6 21.4 17.5L20.8 16.7Z" fill="white"/>
+          </svg>
+          ຢືນຢັນ &amp; ສົ່ງອໍເດີ
+        </button>
+        <button class="pin-btn pin-btn-skip" onclick="pinSkipAndSend()">
+          ✈️ ສົ່ງໂດຍບໍ່ປັກໝຸດ
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ HIST PIN MODAL ═══════════════════ -->
+<div class="hist-pin-modal-ov" id="histPinModal" onclick="if(event.target===this)closeHistModal()">
+  <div class="hist-pin-modal" role="dialog" aria-modal="true" aria-label="ໃສ່ລະຫັດ">
+    <div class="hpm-icon">🔐</div>
+    <div class="hpm-title">ໃສ່ລະຫັດເຂົ້າເບິ່ງ</div>
+    <div class="hpm-sub">ປ້ອນລະຫັດ 6 ຕົວເລກ<br>ເພື່ອເບິ່ງປະຫວັດການສັ່ງ</div>
+    <input class="hpm-input" id="hpmInput" type="tel"
+      maxlength="6" placeholder="_ _ _ _ _ _"
+      autocomplete="off"
+      oninput="this.value=this.value.replace(/\D/g,'')"
+      onkeydown="if(event.key==='Enter'){event.preventDefault();histUnlock();}"
+      style="-webkit-text-security:disc;text-security:disc">
+    <div class="hpm-err" id="hpmErr"></div>
+    <div class="hpm-actions">
+      <button class="hpm-btn hpm-btn-cancel" type="button" onclick="closeHistModal()">ຍົກເລີກ</button>
+      <button class="hpm-btn hpm-btn-ok"     type="button" onclick="histUnlock()">🔓 ເປີດ</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+<script>
+/* ═══════════════════════════════════════
+   DATA
+═══════════════════════════════════════ */
+const MENU = {
+  "sp1": {
+    "name": "ແກງຈືດ ເຕົ້າຮູ້ໝູສັບ",
+    "en": "(Minced Pork and Tofu Soup)",
+    "price": 100000,
+    "cat": "soup",
+    "th": "แกงจืดเต้าหู้หมูสับ",
+    "zh": "肉末豆腐清汤",
+    "vi": "Canh đậu phụ thịt băm"
+  },
+  "sp2": {
+    "name": "ຕົ້ມຍຳທະເລນ້ຳຂຸ້ນ",
+    "en": "(Creamy Tom Yum Seafood)",
+    "price": 100000,
+    "cat": "soup",
+    "th": "ต้มยำทะเลน้ำข้น",
+    "zh": "浓汤冬阴功海鲜",
+    "vi": "Tom yum hải sản nước cốt"
+  },
+  "sp3": {
+    "name": "ຕົ້ມຍຳທະເລນ້ຳໃສ",
+    "en": "(Clear Spicy Seafood Soup)",
+    "price": 100000,
+    "cat": "soup",
+    "th": "ต้มยำทะเลน้ำใส",
+    "zh": "清汤冬阴功海鲜",
+    "vi": "Tom yum hải sản nước trong"
+  },
+  "fr1": {
+    "name": "ເຂົ້າຜັດທະເລ",
+    "en": "(Seafood fried Rice)",
+    "price": 55000,
+    "cat": "friedrice",
+    "th": "ข้าวผัดทะเล",
+    "zh": "海鲜炒饭",
+    "vi": "Cơm chiên hải sản"
+  },
+  "fr2": {
+    "name": "ເຂົ້າຜັດ ຕົ້ມຍຳ",
+    "en": "(Tom Yum Fried Rice)",
+    "price": 55000,
+    "cat": "friedrice",
+    "th": "ข้าวผัดต้มยำ",
+    "zh": "冬阴功炒饭",
+    "vi": "Cơm chiên tom yum"
+  },
+  "fr3": {
+    "name": "ເຂົ້າຜັດງົວ",
+    "en": "( Beef fried Rice )",
+    "price": 55000,
+    "cat": "friedrice",
+    "th": "ข้าวผัดเนื้อวัว",
+    "zh": "牛肉炒饭",
+    "vi": "Cơm chiên thịt bò"
+  },
+  "fr4": {
+    "name": "ເຂົ້າຜັດໝູກອບ",
+    "en": "( Crispy Pork Fried Rice)",
+    "price": 55000,
+    "cat": "friedrice",
+    "th": "ข้าวผัดหมูกรอบ",
+    "zh": "脆皮猪肉炒饭",
+    "vi": "Cơm chiên heo giòn"
+  },
+  "fr5": {
+    "name": "ເຂົ້າຜັດໝູແດງ",
+    "en": "( Red Pork Fried Rice )",
+    "price": 55000,
+    "cat": "friedrice",
+    "th": "ข้าวผัดหมู",
+    "zh": "猪肉炒饭",
+    "vi": "Cơm chiên thịt heo"
+  },
+  "fr6": {
+    "name": "ເຂົ້າຜັດໝູ",
+    "en": "( Pork fried Rice )",
+    "price": 45000,
+    "cat": "friedrice",
+    "th": "ข้าวผัดหมู",
+    "zh": "猪肉炒饭",
+    "vi": "Cơm chiên thịt heo"
+  },
+  "fr7": {
+    "name": "ເຂົ້າຜັດໄກ່",
+    "en": "( Chicken fried Rice)",
+    "price": 45000,
+    "cat": "friedrice",
+    "th": "ข้าวผัดไก่",
+    "zh": "鸡肉炒饭",
+    "vi": "Cơm chiên thịt gà"
+  },
+  "nl1": {
+    "name": "ຜັດຊີອິ້ວ ເສັ້ນໃຫຍ່ ( ທະເລ )",
+    "en": "( Stir-fried flat noodles with soy sauce Seafood )",
+    "price": 55000,
+    "cat": "noodles",
+    "th": "ผัดซีอิ๊วเส้นใหญ่ซีฟู้ด",
+    "zh": "酱油炒河粉（海鲜）",
+    "vi": "Phở xào xì dầu hải sản"
+  },
+  "nl2": {
+    "name": "ຜັດຊີອິ້ວ ເສັ້ນໃຫຍ່ ( ໝູກອບ)",
+    "en": "( Stir-fried flat noodles with soy sauce Crispy Pork )",
+    "price": 55000,
+    "cat": "noodles",
+    "th": "ผัดซีอิ๊วเส้นใหญ่หมูกรอบ",
+    "zh": "酱油炒河粉（脆皮猪肉）",
+    "vi": "Phở xào xì dầu heo giòn"
+  },
+  "nl3": {
+    "name": "ຜັດຊີອິ້ວ ເສັ້ນໃຫຍ່ (  ງົວ )",
+    "en": "( Stir-fried flat noodles with soy sauce Beef )",
+    "price": 55000,
+    "cat": "noodles",
+    "th": "ผัดซีอิ๊วเส้นใหญ่เนื้อวัว",
+    "zh": "酱油炒河粉（牛肉）",
+    "vi": "Phở xào xì dầu thịt bò"
+  },
+  "nl4": {
+    "name": "ຜັດຊີອິ້ວ ເສັ້ນໃຫຍ່ ( ໄກ່ )",
+    "en": "( Stir-fried flat noodles with soy sauce Chicken )",
+    "price": 45000,
+    "cat": "noodles",
+    "th": "ผัดซีอิ๊วเส้นใหญ่ไก่",
+    "zh": "酱油炒河粉（鸡肉）",
+    "vi": "Phở xào xì dầu thịt gà"
+  },
+  "nl5": {
+    "name": "ຜັດຊີອິ້ວ ເສັ້ນໃຫຍ່ ( ໝູ )",
+    "en": "( Stir-fried flat noodles with soy sauce Pork )",
+    "price": 45000,
+    "cat": "noodles",
+    "th": "ผัดซีอิ๊วเส้นใหญ่หมู",
+    "zh": "酱油炒河粉（猪肉）",
+    "vi": "Phở xào xì dầu thịt heo"
+  },
+  "nl6": {
+    "name": "ຜັດຊີອິ້ວ ເສັ້ນໝີ່ເຫຼືອງ ( ທະເລ )",
+    "en": "(Stir-fried Egg Noodles with Soy Sauce Seafood )",
+    "price": 60000,
+    "cat": "noodles",
+    "th": "ผัดซีอิ๊วเส้นหมี่เหลืองซีฟู้ด",
+    "zh": "酱油炒黄面（海鲜）",
+    "vi": "Mì trứng xào xì dầu hải sản"
+  },
+  "nl7": {
+    "name": "ຜັດຊີອິ້ວ ເສັ້ນໝີ່ເຫຼືອງ ( ໝູກອບ )",
+    "en": "(Stir-fried Egg Noodles with Soy Sauce Crispy Pork )",
+    "price": 60000,
+    "cat": "noodles",
+    "th": "ผัดซีอิ๊วเส้นหมี่เหลืองหมูกรอบ",
+    "zh": "酱油炒黄面（脆皮猪肉）",
+    "vi": "Mì trứng xào xì dầu heo giòn"
+  },
+  "nl8": {
+    "name": "ຜັດຊີອິ້ວ ເສັ້ນໝີ່ເຫຼືອງ ( ງົວ )",
+    "en": "(Stir-fried Egg Noodles with Soy Sauce Beef )",
+    "price": 60000,
+    "cat": "noodles",
+    "th": "ผัดซีอิ๊วเส้นหมี่เหลืองเนื้อวัว",
+    "zh": "酱油炒黄面（牛肉）",
+    "vi": "Mì trứng xào xì dầu thịt bò"
+  },
+  "nl9": {
+    "name": "ຜັດຊີອິ້ວ ເສັ້ນໝີ່ເຫຼືອງ ( ໄກ່ )",
+    "en": "(Stir-fried Egg Noodles with Soy Sauce Chicken )",
+    "price": 50000,
+    "cat": "noodles",
+    "th": "ผัดซีอิ๊วเส้นหมี่เหลืองไก่",
+    "zh": "酱油炒黄面（鸡肉）",
+    "vi": "Mì trứng xào xì dầu thịt gà"
+  },
+  "nl10": {
+    "name": "ຜັດຊີອິ້ວ ເສັ້ນໝີ່ເຫຼືອງ ( ໝູ )",
+    "en": "(Stir-fried Egg Noodles with Soy Sauce Pork )",
+    "price": 50000,
+    "cat": "noodles",
+    "th": "ผัดซีอิ๊วเส้นหมี่เหลืองหมู",
+    "zh": "酱油炒黄面（猪肉）",
+    "vi": "Mì trứng xào xì dầu thịt heo"
+  },
+  "nl11": {
+    "name": "ລາດໜ້າ ເສັ້ນໃຫຍ່ ( ທະເລ)",
+    "en": "(Stir-Fried Wide Rice Noodles in Thick Gravy Seafood-Crispy Pork-Beef )",
+    "price": 55000,
+    "cat": "noodles",
+    "th": "ราดหน้าเส้นใหญ่ซีฟู้ด",
+    "zh": "河粉ราดหน้า（海鲜）",
+    "vi": "Hủ tiếu xào sốt sệt hải sản"
+  },
+  "nl12": {
+    "name": "ລາດໜ້າ ເສັ້ນໃຫຍ່ ( ໝູກອບ)",
+    "en": "(Stir-Fried Wide Rice Noodles in Thick Gravy Seafood-Crispy Pork-Beef )",
+    "price": 55000,
+    "cat": "noodles",
+    "th": "ราดหน้าเส้นใหญ่หมูกรอบ",
+    "zh": "河粉ราดหน้า（脆皮猪肉）",
+    "vi": "Hủ tiếu xào sốt sệt heo giòn"
+  },
+  "nl13": {
+    "name": "ລາດໜ້າ ເສັ້ນໃຫຍ່ ( ງົວ )",
+    "en": "(Stir-Fried Wide Rice Noodles in Thick Gravy Seafood-Crispy Pork-Beef )",
+    "price": 55000,
+    "cat": "noodles",
+    "th": "ราดหน้าเส้นใหญ่เนื้อวัว",
+    "zh": "河粉ราดหน้า（牛肉）",
+    "vi": "Hủ tiếu xào sốt sệt thịt bò"
+  },
+  "nl14": {
+    "name": "ລາດໜ້າ ເສັ້ນໃຫຍ່ ( ໄກ່ )",
+    "en": "(Stir-Fried Wide Rice Noodles in Thick Gravy Chicken)",
+    "price": 45000,
+    "cat": "noodles",
+    "th": "ราดหน้าเส้นใหญ่ไก่",
+    "zh": "河粉ราดหน้า（鸡肉）",
+    "vi": "Hủ tiếu xào sốt sệt thịt gà"
+  },
+  "nl15": {
+    "name": "ລາດໜ້າ ເສັ້ນໃຫຍ່ ( ໝູ )",
+    "en": "(Stir-Fried Wide Rice Noodles in Thick Gravy Pork )",
+    "price": 45000,
+    "cat": "noodles",
+    "th": "ราดหน้าเส้นใหญ่หมู",
+    "zh": "河粉ราดหน้า（猪肉）",
+    "vi": "Hủ tiếu xào sốt sệt thịt heo"
+  },
+  "nl16": {
+    "name": "ລາດໜ້າ ໝີ່ເຫຼືອງ ( ທະເລ)",
+    "en": "(Crispy egg noodles in gravy sauce Seafood )",
+    "price": 60000,
+    "cat": "noodles",
+    "th": "ราดหน้าหมี่เหลืองซีฟู้ด",
+    "zh": "黄面ราดหน้า（海鲜）",
+    "vi": "Mì trứng xào sốt sệt hải sản"
+  },
+  "nl17": {
+    "name": "ລາດໜ້າ ໝີ່ເຫຼືອງ ( ໝູກອບ )",
+    "en": "(Crispy egg noodles in gravy sauce Crispy Pork)",
+    "price": 60000,
+    "cat": "noodles",
+    "th": "ราดหน้าหมี่เหลืองหมูกรอบ",
+    "zh": "黄面ราดหน้า（脆皮猪肉）",
+    "vi": "Mì trứng xào sốt sệt heo giòn"
+  },
+  "nl18": {
+    "name": "ລາດໜ້າ ໝີ່ເຫຼືອງ ( ງົວ )",
+    "en": "(Crispy egg noodles in gravy sauce Beef )",
+    "price": 60000,
+    "cat": "noodles",
+    "th": "ราดหน้าหมี่เหลืองเนื้อวัว",
+    "zh": "黄面ราดหน้า（牛肉）",
+    "vi": "Mì trứng xào sốt sệt thịt bò"
+  },
+  "nl19": {
+    "name": "ລາດໜ້າ ໝີ່ເຫຼືອງ ( ໄກ່ )",
+    "en": "(Crispy egg noodles in gravy sauce Chicken )",
+    "price": 50000,
+    "cat": "noodles",
+    "th": "ราดหน้าหมี่เหลืองไก่",
+    "zh": "黄面ราดหน้า（鸡肉）",
+    "vi": "Mì trứng xào sốt sệt thịt gà"
+  },
+  "nl20": {
+    "name": "ລາດໜ້າ ໝີ່ເຫຼືອງ ( ໝູ )",
+    "en": "(Crispy egg noodles in gravy sauce Pork )",
+    "price": 50000,
+    "cat": "noodles",
+    "th": "ราดหน้าหมี่เหลืองหมู",
+    "zh": "黄面ราดหน้า（猪肉）",
+    "vi": "Mì trứng xào sốt sệt thịt heo"
+  },
+  "nl21": {
+    "name": "ຜັດຂີ້ເມົາ ໝີ່ໄວໄວ ( ທະເລ )",
+    "en": "(Drunken Wai Wai Seafood )",
+    "price": 55000,
+    "cat": "noodles",
+    "th": "ผัดขี้เม่าหมี่ไวไวซีฟู้ด",
+    "zh": "醉炒味味面（海鲜）",
+    "vi": "Mì Wai Wai xào cay hải sản"
+  },
+  "nl22": {
+    "name": "ຜັດຂີ້ເມົາ ໝີ່ໄວໄວ ( ໝູກອບ )",
+    "en": "(Drunken Wai Wai Crispy Pork)",
+    "price": 55000,
+    "cat": "noodles",
+    "th": "ผัดขี้เม่าหมี่ไวไวหมูกรอบ",
+    "zh": "醉炒味味面（脆皮猪肉）",
+    "vi": "Mì Wai Wai xào cay heo giòn"
+  },
+  "nl23": {
+    "name": "ຜັດຂີ້ເມົາ ໝີ່ໄວໄວ ( ງົວ )",
+    "en": "(Drunken Wai Wai Beef)",
+    "price": 55000,
+    "cat": "noodles",
+    "th": "ผัดขี้เม่าหมี่ไวไวเนื้อวัว",
+    "zh": "醉炒味味面（牛肉）",
+    "vi": "Mì Wai Wai xào cay thịt bò"
+  },
+  "nl24": {
+    "name": "ຜັດຂີ້ເມົາ ໝີ່ໄວໄວ ( ໄກ່ )",
+    "en": "(Drunken Wai Wai Chicken )",
+    "price": 45000,
+    "cat": "noodles",
+    "th": "ผัดขี้เม่าหมี่ไวไวไก่",
+    "zh": "醉炒味味面（鸡肉）",
+    "vi": "Mì Wai Wai xào cay thịt gà"
+  },
+  "nl25": {
+    "name": "ຜັດຂີ້ເມົາ ໝີ່ໄວໄວ ( ໝູ )",
+    "en": "(Drunken Wai Wai Pork )",
+    "price": 45000,
+    "cat": "noodles",
+    "th": "ผัดขี้เม่าหมี่ไวไวหมู",
+    "zh": "醉炒味味面（猪肉）",
+    "vi": "Mì Wai Wai xào cay thịt heo"
+  },
+  "nl26": {
+    "name": "ຜັດຂີ້ເມົາ ໝີ່ເຫຼືອງ ( ທະເລ )",
+    "en": "(Stir-fried Spicy Egg Noodles with Basil Seafood )",
+    "price": 55000,
+    "cat": "noodles",
+    "th": "ผัดขี้เม่าหมี่เหลืองซีฟู้ด",
+    "zh": "醉炒黄面（海鲜）",
+    "vi": "Mì trứng xào kiểu say hải sản"
+  },
+  "nl27": {
+    "name": "ຜັດຂີ້ເມົາ ໝີ່ເຫຼືອງ ( ໝູກອບ )",
+    "en": "(Stir-fried Spicy Egg Noodles with Basil Crispy Pork )",
+    "price": 55000,
+    "cat": "noodles",
+    "th": "ผัดขี้เม่าหมี่เหลืองหมูกรอบ",
+    "zh": "醉炒黄面（脆皮猪肉）",
+    "vi": "Mì trứng xào kiểu say heo giòn"
+  },
+  "nl28": {
+    "name": "ຜັດຂີ້ເມົາ ໝີ່ເຫຼືອງ (  ງົວ )",
+    "en": "(Stir-fried Spicy Egg Noodles with Basil Beef )",
+    "price": 55000,
+    "cat": "noodles",
+    "th": "ผัดขี้เม่าหมี่เหลืองเนื้อวัว",
+    "zh": "醉炒黄面（牛肉）",
+    "vi": "Mì trứng xào kiểu say thịt bò"
+  },
+  "nl29": {
+    "name": "ຜັດຂີ້ເມົາ ໝີ່ເຫຼືອງ ( ໄກ່ )",
+    "en": "(Stir-fried Spicy Egg Noodles with Basil Chicken )",
+    "price": 45000,
+    "cat": "noodles",
+    "th": "ผัดขี้เม่าหมี่เหลืองไก่",
+    "zh": "醉炒黄面（鸡肉）",
+    "vi": "Mì trứng xào kiểu say thịt gà"
+  },
+  "nl30": {
+    "name": "ຜັດຂີ້ເມົາ ໝີ່ເຫຼືອງ ( ໝູ )",
+    "en": "(Stir-fried Spicy Egg Noodles with Basil Pork )",
+    "price": 45000,
+    "cat": "noodles",
+    "th": "ผัดขี้เม่าหมี่เหลืองหมู",
+    "zh": "醉炒黄面（猪肉）",
+    "vi": "Mì trứng xào kiểu say thịt heo"
+  },
+  "nl31": {
+    "name": "ສຸກີ້ນ້ຳ ( ທະເລ )",
+    "en": "(Sukiyaki Seafood )",
+    "price": 60000,
+    "cat": "noodles",
+    "th": "สุกี้น้ำซีฟู้ด",
+    "zh": "水煮泰式火锅（海鲜）",
+    "vi": "Suki nước hải sản"
+  },
+  "nl32": {
+    "name": "ສຸກີ້ນ້ຳ ( ໝູກອບ )",
+    "en": "(Sukiyaki Crispy Pork )",
+    "price": 60000,
+    "cat": "noodles",
+    "th": "สุกี้น้ำหมูกรอบ",
+    "zh": "水煮泰式火锅（脆皮猪肉）",
+    "vi": "Suki nước heo giòn"
+  },
+  "nl33": {
+    "name": "ສຸກີ້ນ້ຳ ( ງົວ )",
+    "en": "(Sukiyaki Beef )",
+    "price": 60000,
+    "cat": "noodles",
+    "th": "สุกี้น้ำเนื้อวัว",
+    "zh": "水煮泰式火锅（牛肉）",
+    "vi": "Suki nước thịt bò"
+  },
+  "nl34": {
+    "name": "ສຸກີ້ນ້ຳ ( ໄກ່ )",
+    "en": "(Sukiyaki Chicken )",
+    "price": 50000,
+    "cat": "noodles",
+    "th": "สุกี้น้ำไก่",
+    "zh": "水煮泰式火锅（鸡肉）",
+    "vi": "Suki nước thịt gà"
+  },
+  "nl35": {
+    "name": "ສຸກີ້ນ້ຳ ( ໝູ )",
+    "en": "(Sukiyaki Pork )",
+    "price": 50000,
+    "cat": "noodles",
+    "th": "สุกี้น้ำหมู",
+    "zh": "水煮泰式火锅（猪肉）",
+    "vi": "Suki nước thịt heo"
+  },
+  "nl36": {
+    "name": "ສຸກີ້ແຫ້ງ ( ທະເລ )",
+    "en": "(Stir-fried Thai sukiyaki Seafood )",
+    "price": 60000,
+    "cat": "noodles",
+    "th": "สุกี้แห้งซีฟู้ด",
+    "zh": "干炒泰式火锅（海鲜）",
+    "vi": "Suki khô hải sản"
+  },
+  "nl37": {
+    "name": "ສຸກີ້ແຫ້ງ ( ໝູກອບ )",
+    "en": "(Stir-fried Thai sukiyaki Crispy Pork)",
+    "price": 60000,
+    "cat": "noodles",
+    "th": "สุกี้แห้งหมูกรอบ",
+    "zh": "干炒泰式火锅（脆皮猪肉）",
+    "vi": "Suki khô heo giòn"
+  },
+  "nl38": {
+    "name": "ສຸກີ້ແຫ້ງ ( ງົວ )",
+    "en": "(Stir-fried Thai sukiyaki Beef )",
+    "price": 60000,
+    "cat": "noodles",
+    "th": "สุกี้แห้งเนื้อวัว",
+    "zh": "干炒泰式火锅（牛肉）",
+    "vi": "Suki khô thịt bò"
+  },
+  "nl39": {
+    "name": "ສຸກີ້ແຫ້ງ ( ໄກ່ )",
+    "en": "(Stir-fried Thai sukiyaki Chicken )",
+    "price": 50000,
+    "cat": "noodles",
+    "th": "สุกี้แห้งไก่",
+    "zh": "干炒泰式火锅（鸡肉）",
+    "vi": "Suki khô thịt gà"
+  },
+  "nl40": {
+    "name": "ສຸກີ້ແຫ້ງ ( ໝູ )",
+    "en": "(Stir-fried Thai sukiyaki Pork )",
+    "price": 50000,
+    "cat": "noodles",
+    "th": "สุกี้แห้งหมู",
+    "zh": "干炒泰式火锅（猪肉）",
+    "vi": "Suki khô thịt heo"
+  },
+  "nl41": {
+    "name": "ຜັດໄທ ( ທະເລ )",
+    "en": "(Pad Thai Seafood )",
+    "price": 60000,
+    "cat": "noodles",
+    "th": "ผัดไทยซีฟู้ด",
+    "zh": "泰式炒粉（海鲜）",
+    "vi": "Pad Thai hải sản"
+  },
+  "nl42": {
+    "name": "ຜັດໄທ ( ໝູກອບ )",
+    "en": "(Pad Thai Crispy Pork )",
+    "price": 60000,
+    "cat": "noodles",
+    "th": "ผัดไทยหมูกรอบ",
+    "zh": "泰式炒粉（脆皮猪肉）",
+    "vi": "Pad Thai heo giòn"
+  },
+  "nl43": {
+    "name": "ຜັດໄທ ( ງົວ )",
+    "en": "(Pad Thai Beef )",
+    "price": 60000,
+    "cat": "noodles",
+    "th": "ผัดไทยเนื้อวัว",
+    "zh": "泰式炒粉（牛肉）",
+    "vi": "Pad Thai thịt bò"
+  },
+  "nl44": {
+    "name": "ຜັດໄທ ( ໄກ່ )",
+    "en": "(Pad Thai Chicken )",
+    "price": 50000,
+    "cat": "noodles",
+    "th": "ผัดไทยไก่",
+    "zh": "泰式炒粉（鸡肉）",
+    "vi": "Pad Thai thịt gà"
+  },
+  "nl45": {
+    "name": "ຜັດໄທ ( ໝູ )",
+    "en": "(Pad Thai Pork )",
+    "price": 50000,
+    "cat": "noodles",
+    "th": "ผัดไทยหมู",
+    "zh": "泰式炒粉（猪肉）",
+    "vi": "Pad Thai thịt heo"
+  },
+  "nd1": {
+    "name": "ໝີ່ເປັດ",
+    "en": "(Roasted Duck Noodle)",
+    "price": 45000,
+    "cat": "noodledish",
+    "th": "บะหมี่เป็ดย่าง",
+    "zh": "烧鸭面",
+    "vi": "Mì vịt quay"
+  },
+  "nd2": {
+    "name": "ໝີ່ແຫ້ງເປັດ",
+    "en": "(Dry Egg Noodles with Roasted Duck)",
+    "price": 45000,
+    "cat": "noodledish",
+    "th": "บะหมี่แห้งเป็ดย่าง",
+    "zh": "干拌烧鸭面",
+    "vi": "Mì khô vịt quay"
+  },
+  "nd3": {
+    "name": "ກ໋ຽວໝູກອບ",
+    "en": "(Crispy Pork Wonton)",
+    "price": 45000,
+    "cat": "noodledish",
+    "th": "เกี๊ยวหมูกรอบ",
+    "zh": "脆皮猪肉馄饨",
+    "vi": "Hoành thánh heo giòn"
+  },
+  "nd4": {
+    "name": "ເຟີງົວ",
+    "en": "(Beef Noodle Soup)",
+    "price": 45000,
+    "cat": "noodledish",
+    "th": "เฝอเนื้อ",
+    "zh": "牛肉粉",
+    "vi": "Phở bò"
+  },
+  "nd5": {
+    "name": "ເຂົ້າປຽກໝູກອບ",
+    "en": "(Crispy Pork Thick Rice Noodle Soup)",
+    "price": 40000,
+    "cat": "noodledish",
+    "th": "ข้าวเปียกหมูกรอบ",
+    "zh": "脆皮猪肉粥粉",
+    "vi": "Cháo bột gạo heo giòn"
+  },
+  "nd6": {
+    "name": "ເຂົ້າປຽກເປັດ",
+    "en": "(Duck Thick Rice Noodle Soup)",
+    "price": 40000,
+    "cat": "noodledish",
+    "th": "ข้าวเปียกเป็ด",
+    "zh": "鸭肉米粉汤",
+    "vi": "Cháo bột gạo vịt"
+  },
+  "nd7": {
+    "name": "ເຂົ້າປຽກໝູແດງ",
+    "en": "(Red BBQ Pork Rice Noodle Soup)",
+    "price": 40000,
+    "cat": "noodledish",
+    "th": "ข้าวเปียกหมูแดง",
+    "zh": "叉烧米粉汤",
+    "vi": "Cháo bột gạo xá xíu"
+  },
+  "nd8": {
+    "name": "ເຂົ້າປຽກໄກ່",
+    "en": "(Chicken Rice Noodle Soup)",
+    "price": 40000,
+    "cat": "noodledish",
+    "th": "ข้าวเปียกไก่",
+    "zh": "鸡肉米粉汤",
+    "vi": "Cháo bột gạo gà"
+  },
+  "nd9": {
+    "name": "ກ໋ຽວໝູແດງ",
+    "en": "(Wonton with Roasted Red Pork)",
+    "price": 50000,
+    "cat": "noodledish",
+    "th": "เกี๊ยวหมูแดง",
+    "zh": "叉烧馄饨",
+    "vi": "Hoành thánh xá xíu"
+  },
+  "rc1": {
+    "name": "ກາດນາ ( ທະເລ )",
+    "en": "(Fried Kale with Crispy Seafood )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "คะน้าผัดซีฟู้ด",
+    "zh": "炒芥蓝（海鲜）",
+    "vi": "Cải kale xào hải sản"
+  },
+  "rc2": {
+    "name": "ກາດນາ ( ໝູກອບ)",
+    "en": "(Fried Kale with Crispy Crispy Pork )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "คะน้าผัดหมูกรอบ",
+    "zh": "炒芥蓝（脆皮猪肉）",
+    "vi": "Cải kale xào heo giòn"
+  },
+  "rc3": {
+    "name": "ກາດນາ ( ງົວ)",
+    "en": "(Fried Kale with Crispy Beef )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "คะน้าผัดเนื้อวัว",
+    "zh": "炒芥蓝（牛肉）",
+    "vi": "Cải kale xào thịt bò"
+  },
+  "rc4": {
+    "name": "ກາດນາ ( ໄກ່ )",
+    "en": "(Fried Kale with Crispy Chicken )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "คะน้าผัดไก่",
+    "zh": "炒芥蓝（鸡肉）",
+    "vi": "Cải kale xào thịt gà"
+  },
+  "rc5": {
+    "name": "ກາດນາ ( ໝູ )",
+    "en": "(Fried Kale with Crispy Pork )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "คะน้าผัดหมู",
+    "zh": "炒芥蓝（猪肉）",
+    "vi": "Cải kale xào thịt heo"
+  },
+  "rc6": {
+    "name": "ກະເພົາ ( ທະເລ )",
+    "en": "(Stir Fried Crispy  with Holy Basil Seafood )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "กะเพราซีฟู้ด",
+    "zh": "打抛炒海鲜",
+    "vi": "Pad kra pao hải sản"
+  },
+  "rc7": {
+    "name": "ກະເພົາ ( ໝູກອບ)",
+    "en": "(Stir Fried Crispy with Holy Basil Crispy Pork)",
+    "price": 50000,
+    "cat": "rice",
+    "th": "กะเพราหมูกรอบ",
+    "zh": "打抛炒脆皮猪肉",
+    "vi": "Pad kra pao heo giòn"
+  },
+  "rc8": {
+    "name": "ກະເພົາ ( ງົວ)",
+    "en": "(Stir Fried Crispy with Holy Basil Beef )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "กะเพราเนื้อวัว",
+    "zh": "打抛炒牛肉",
+    "vi": "Pad kra pao thịt bò"
+  },
+  "rc9": {
+    "name": "ກະເພົາ ( ໄກ່ )",
+    "en": "(Stir Fried Crispy with Holy Basil Chicken )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "กะเพราไก่",
+    "zh": "打抛炒鸡肉",
+    "vi": "Pad kra pao thịt gà"
+  },
+  "rc10": {
+    "name": "ກະເພົາ ( ໝູ )",
+    "en": "(Stir Fried Crispy with Holy Basil Pork )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "กะเพราหมู",
+    "zh": "打抛炒猪肉",
+    "vi": "Pad kra pao thịt heo"
+  },
+  "rc11": {
+    "name": "ຜັດກະເພົາ ( ທະເລ )",
+    "en": "( Stir-fry with Holy Basil Seafood )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดกะเพราซีฟู้ด",
+    "zh": "罗勒炒海鲜",
+    "vi": "Xào lá húng quế hải sản"
+  },
+  "rc12": {
+    "name": "ຜັດກະເພົາ ( ໝູກອບ)",
+    "en": "( Stir-fry with Holy Basil Crispy Pork )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดกะเพราหมูกรอบ",
+    "zh": "罗勒炒脆皮猪肉",
+    "vi": "Xào lá húng quế heo giòn"
+  },
+  "rc13": {
+    "name": "ຜັດກະເພົາ ( ງົວ)",
+    "en": "( Stir-fry with Holy Basil Beef )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดกะเพราเนื้อวัว",
+    "zh": "罗勒炒牛肉",
+    "vi": "Xào lá húng quế thịt bò"
+  },
+  "rc14": {
+    "name": "ຜັດກະເພົາ ( ໄກ່ )",
+    "en": "( Stir-fry with Holy Basil Chicken )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดกะเพราไก่",
+    "zh": "罗勒炒鸡肉",
+    "vi": "Xào lá húng quế thịt gà"
+  },
+  "rc15": {
+    "name": "ຜັດກະເພົາ ( ໝູ )",
+    "en": "( Stir-fry with Holy Basil Pork )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดกะเพราหมู",
+    "zh": "罗勒炒猪肉",
+    "vi": "Xào lá húng quế thịt heo"
+  },
+  "rc16": {
+    "name": "ຜັດກາດນາ ( ທະເລ )",
+    "en": "( Stir-fried Kale Seafood )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดคะน้าซีฟู้ด",
+    "zh": "炒芥蓝海鲜",
+    "vi": "Cải kale xào hải sản"
+  },
+  "rc17": {
+    "name": "ຜັດກາດນາ ( ໝູກອບ)",
+    "en": "( Stir-fried Kale Crispy Pork )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดคะน้าหมูกรอบ",
+    "zh": "炒芥蓝脆皮猪肉",
+    "vi": "Cải kale xào heo giòn"
+  },
+  "rc18": {
+    "name": "ຜັດກາດນາ ( ງົວ)",
+    "en": "( Stir-fried Kale Beef )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดคะน้าเนื้อวัว",
+    "zh": "炒芥蓝牛肉",
+    "vi": "Cải kale xào thịt bò"
+  },
+  "rc19": {
+    "name": "ຜັດກາດນາ ( ໄກ່ )",
+    "en": "( Stir-fried Kale Chicken )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดคะน้าไก่",
+    "zh": "炒芥蓝鸡肉",
+    "vi": "Cải kale xào thịt gà"
+  },
+  "rc20": {
+    "name": "ຜັດກາດນາ  ( ໝູ )",
+    "en": "( Stir-fried Kale Pork )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดคะน้าหมู",
+    "zh": "炒芥蓝猪肉",
+    "vi": "Cải kale xào thịt heo"
+  },
+  "rc21": {
+    "name": "ຜັດພິກເຜົາ  ( ທະເລ )",
+    "en": "(Stir Fried with Roasted Red Chili Paste Seafood )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดพริกเผาซีฟู้ด",
+    "zh": "炒烤辣椒酱海鲜",
+    "vi": "Xào sốt ớt rang hải sản"
+  },
+  "rc22": {
+    "name": "ຜັດພິກເຜົາ ( ໝູກອບ)",
+    "en": "(Stir Fried  with Roasted Red Chili Paste Crispy Pork )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดพริกเผาหมูกรอบ",
+    "zh": "炒烤辣椒酱脆皮猪肉",
+    "vi": "Xào sốt ớt rang heo giòn"
+  },
+  "rc23": {
+    "name": "ຜັດພິກເຜົາ ( ງົວ)",
+    "en": "(Stir Fried  with Roasted Red Chili Paste Beef )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดพริกเผาเนื้อวัว",
+    "zh": "炒烤辣椒酱牛肉",
+    "vi": "Xào sốt ớt rang thịt bò"
+  },
+  "rc24": {
+    "name": "ຜັດພິກເຜົາ (ໄກ່)",
+    "en": "(Stir Fried  with Roasted Red Chili Paste Chicken )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดพริกเผาไก่",
+    "zh": "炒烤辣椒酱鸡肉",
+    "vi": "Xào sốt ớt rang thịt gà"
+  },
+  "rc25": {
+    "name": "ຜັດພິກເຜົາ  ( ໝູ )",
+    "en": "(Stir Fried  with Roasted Red Chili Paste Pork )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดพริกเผาหมู",
+    "zh": "炒烤辣椒酱猪肉",
+    "vi": "Xào sốt ớt rang thịt heo"
+  },
+  "rc26": {
+    "name": "ຜັດພິກແກງ ( ທະເລ )",
+    "en": "(Spicy Stir-fried  with Red Curry Paste Seafood )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดพริกแกงซีฟู้ด",
+    "zh": "红咖喱酱炒海鲜",
+    "vi": "Xào sốt cà ri đỏ hải sản"
+  },
+  "rc27": {
+    "name": "ຜັດພິກແກງ ( ໝູກອບ)",
+    "en": "(Spicy Stir-fried  with Red Curry Paste Crispy Pork )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดพริกแกงหมูกรอบ",
+    "zh": "红咖喱酱炒脆皮猪肉",
+    "vi": "Xào sốt cà ri đỏ heo giòn"
+  },
+  "rc28": {
+    "name": "ຜັດພິກແກງ ( ງົວ)",
+    "en": "(Spicy Stir-fried  with Red Curry Paste Beef )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดพริกแกงเนื้อวัว",
+    "zh": "红咖喱酱炒牛肉",
+    "vi": "Xào sốt cà ri đỏ thịt bò"
+  },
+  "rc29": {
+    "name": "ຜັດພິກແກງ  ( ໄກ່ )",
+    "en": "(Spicy Stir-fried  with Red Curry Paste Chicken)",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดพริกแกงไก่",
+    "zh": "红咖喱酱炒鸡肉",
+    "vi": "Xào sốt cà ri đỏ thịt gà"
+  },
+  "rc30": {
+    "name": "ຜັດພິກແກງ  ( ໝູ )",
+    "en": "(Spicy Stir-fried  with Red Curry Pork )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดพริกแกงหมู",
+    "zh": "红咖喱酱炒猪肉",
+    "vi": "Xào sốt cà ri đỏ thịt heo"
+  },
+  "rc31": {
+    "name": "ຜັດຜັກລວມມິດ ( ທະເລ )",
+    "en": "(Stir-Fried Mixed Vegetables Seafood )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดผักรวมมิตรซีฟู้ด",
+    "zh": "什锦蔬菜炒海鲜",
+    "vi": "Rau củ thập cẩm xào hải sản"
+  },
+  "rc32": {
+    "name": "ຜັດຜັກລວມມິດ ( ໝູກອບ)",
+    "en": "(Stir-Fried Mixed Vegetables Crispy Pork )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดผักรวมมิตรหมูกรอบ",
+    "zh": "什锦蔬菜炒脆皮猪肉",
+    "vi": "Rau củ thập cẩm xào heo giòn"
+  },
+  "rc33": {
+    "name": "ຜັດຜັກລວມມິດ ( ງົວ)",
+    "en": "(Stir-Fried Mixed Vegetables Beef )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดผักรวมมิตรเนื้อวัว",
+    "zh": "什锦蔬菜炒牛肉",
+    "vi": "Rau củ thập cẩm xào thịt bò"
+  },
+  "rc34": {
+    "name": "ຜັດຜັກລວມມິດ ( ໄກ່ )",
+    "en": "(Stir-Fried Mixed Vegetables Chicken )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดผักรวมมิตรไก่",
+    "zh": "什锦蔬菜炒鸡肉",
+    "vi": "Rau củ thập cẩm xào thịt gà"
+  },
+  "rc35": {
+    "name": "ຜັດຜັກລວມມິດ ( ໝູ )",
+    "en": "(Stir-Fried Mixed Vegetables Pork )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดผักรวมมิตรหมู",
+    "zh": "什锦蔬菜炒猪肉",
+    "vi": "Rau củ thập cẩm xào thịt heo"
+  },
+  "rc36": {
+    "name": "ຜັດຜົງກະຫຣີ່ ( ທະເລ )",
+    "en": "(Stir-fried  with Curry Powder Seafood )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดผงกะหรี่ซีฟู้ด",
+    "zh": "咖喱粉炒海鲜",
+    "vi": "Xào bột cà ri hải sản"
+  },
+  "rc37": {
+    "name": "ຜັດຜົງກະຫຣີ່ ( ໝູກອບ)",
+    "en": "(Stir-fried  with Curry Powder Crispy Pork )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดผงกะหรี่หมูกรอบ",
+    "zh": "咖喱粉炒脆皮猪肉",
+    "vi": "Xào bột cà ri heo giòn"
+  },
+  "rc38": {
+    "name": "ຜັດຜົງກະຫຣີ່ ( ງົວ)",
+    "en": "(Stir-fried  with Curry Powder Beef )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดผงกะหรี่เนื้อวัว",
+    "zh": "咖喱粉炒牛肉",
+    "vi": "Xào bột cà ri thịt bò"
+  },
+  "rc39": {
+    "name": "ຜັດຜົງກະຫຣີ່ ( ໄກ່ )",
+    "en": "(Stir-fried  with Curry Powder Chicken )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดผงกะหรี่ไก่",
+    "zh": "咖喱粉炒鸡肉",
+    "vi": "Xào bột cà ri thịt gà"
+  },
+  "rc40": {
+    "name": "ຜັດຜົງກະຫຣີ່ ( ໝູ )",
+    "en": "(Stir-fried  with Curry Powder Pork )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดผงกะหรี่หมู",
+    "zh": "咖喱粉炒猪肉",
+    "vi": "Xào bột cà ri thịt heo"
+  },
+  "rc41": {
+    "name": "ຜັດທະເລ",
+    "en": "(Stir-fried Seafood)",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดทะเล",
+    "zh": "炒海鲜",
+    "vi": "Hải sản xào"
+  },
+  "rc42": {
+    "name": "ຜັດໝູກອບ",
+    "en": "(Stir-fried Crispy Pork )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดหมูกรอบ",
+    "zh": "炒脆皮猪肉",
+    "vi": "Heo giòn xào"
+  },
+  "rc43": {
+    "name": "ຜັດງົວ",
+    "en": "(Stir-fried Beef )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดเนื้อวัว",
+    "zh": "炒牛肉",
+    "vi": "Thịt bò xào"
+  },
+  "rc44": {
+    "name": "ຜັດໄກ່",
+    "en": "(Stir-fried Chicken)",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดไก่",
+    "zh": "炒鸡肉",
+    "vi": "Gà xào"
+  },
+  "rc45": {
+    "name": "ຜັດໝູ",
+    "en": "(Stir-fried Pork )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดหมู",
+    "zh": "炒猪肉",
+    "vi": "Thịt heo xào"
+  },
+  "rc46": {
+    "name": "ຜັດສະເຕັກ ( ງົວ)",
+    "en": "(Stir-fried Steak Beef )",
+    "price": 50000,
+    "cat": "rice",
+    "th": "ผัดสเต๊กเนื้อวัว",
+    "zh": "炒牛排肉（牛肉）",
+    "vi": "Bít tết xào thịt bò"
+  },
+  "rc47": {
+    "name": "ຜັດສະເຕັກ ( ໄກ່ )",
+    "en": "(Stir-fried Steak Chicken )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดสเต๊กไก่",
+    "zh": "炒牛排肉（鸡肉）",
+    "vi": "Bít tết xào thịt gà"
+  },
+  "rc48": {
+    "name": "ຜັດສະເຕັກ ( ໝູ )",
+    "en": "(Stir-fried Steak Pork )",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ผัดสเต๊กหมู",
+    "zh": "炒牛排肉（猪肉）",
+    "vi": "Bít tết xào thịt heo"
+  },
+  "rc49": {
+    "name": "ງົວຜັດຂິງ",
+    "en": "(Stir-Fried Beef with Ginger)",
+    "price": 50000,
+    "cat": "rice",
+    "th": "เนื้อผัดขิง",
+    "zh": "姜炒牛肉",
+    "vi": "Thịt bò xào gừng"
+  },
+  "rc50": {
+    "name": "ໄກ່ຜັດຂິງ",
+    "en": "(Stir-Fried Chicken with Ginger)",
+    "price": 45000,
+    "cat": "rice",
+    "th": "ไก่ผัดขิง",
+    "zh": "姜炒鸡肉",
+    "vi": "Gà xào gừng"
+  },
+  "rc51": {
+    "name": "ໝູຜັດຂິງ",
+    "en": "(Stir-Fried Pork with Ginger)",
+    "price": 45000,
+    "cat": "rice",
+    "th": "หมูผัดขิง",
+    "zh": "姜炒猪肉",
+    "vi": "Thịt heo xào gừng"
+  },
+  "rc52": {
+    "name": "ໝູທອດກະທຽມ",
+    "en": "(Fried Pork with Garlic)",
+    "price": 45000,
+    "cat": "rice",
+    "th": "หมูทอดกระเทียม",
+    "zh": "蒜香炸猪肉",
+    "vi": "Thịt heo chiên tỏi"
+  },
+  "rc53": {
+    "name": "ໄຂ່ຈຽວໝູສັບ",
+    "en": "(Minced Pork Omelette)",
+    "price": 5000,
+    "cat": "rice",
+    "th": "ไข่เจียวหมูสับ",
+    "zh": "猪肉末煎蛋",
+    "vi": "Trứng chiên thịt băm"
+  },
+  "ds1": {
+    "name": "ຈີບໝູ",
+    "en": "Pork Siu Mai",
+    "price": 10000,
+    "cat": "dimsum",
+    "th": "ขนมจีบหมู",
+    "zh": "猪肉烧卖",
+    "vi": "Siu mai heo"
+  },
+  "ds2": {
+    "name": "ຈີບກຸ້ງ",
+    "en": "Shrimp Siu Mai",
+    "price": 10000,
+    "cat": "dimsum",
+    "th": "ขนมจีบกุ้ง",
+    "zh": "虾烧卖",
+    "vi": "Siu mai tôm"
+  },
+  "ds3": {
+    "name": "ຈີບຕັບ",
+    "en": "Liver Siu Mai",
+    "price": 10000,
+    "cat": "dimsum",
+    "th": "ขนมจีบตับ",
+    "zh": "肝烧卖",
+    "vi": "Siu mai gan"
+  },
+  "ds4": {
+    "name": "ໄຂ່ນົກ",
+    "en": "Quail Egg",
+    "price": 10000,
+    "cat": "dimsum",
+    "th": "ไข่นกกระทา",
+    "zh": "鹌鹑蛋",
+    "vi": "Trứng cút"
+  },
+  "ds5": {
+    "name": "ໄຂ່ຢ່ຽວມ້າ",
+    "en": "Century Egg",
+    "price": 10000,
+    "cat": "dimsum",
+    "th": "ไข่เยี่ยวม้า",
+    "zh": "皮蛋",
+    "vi": "Trứng bắc thảo"
+  },
+  "ds6": {
+    "name": "ເຕົາຮູ້ປາ",
+    "en": "Fish Tofu",
+    "price": 10000,
+    "cat": "dimsum",
+    "th": "เต้าหู้ปลา",
+    "zh": "鱼豆腐",
+    "vi": "Đậu hũ cá"
+  },
+  "ds7": {
+    "name": "ປາດອນລີ້",
+    "en": "Dolly Fish",
+    "price": 10000,
+    "cat": "dimsum",
+    "th": "ปลาดอลลี่",
+    "zh": "多利鱼",
+    "vi": "Cá dory"
+  },
+  "ds8": {
+    "name": "ປູອັດສາລ່າຍ",
+    "en": "Crab Stick with Seaweed",
+    "price": 10000,
+    "cat": "dimsum",
+    "th": "ปูอัดสาหร่าย",
+    "zh": "海苔蟹柳",
+    "vi": "Thanh cua cuộn rong biển"
+  },
+  "ds9": {
+    "name": "ເຫັດເຂັມຫໍ່ສາລ່າຍ",
+    "en": "Enoki Mushroom Wrapped with Seaweed",
+    "price": 10000,
+    "cat": "dimsum",
+    "th": "เห็ดเข็มทองห่อสาหร่าย",
+    "zh": "海苔金针菇卷",
+    "vi": "Nấm kim châm cuộn rong biển"
+  },
+  "ds10": {
+    "name": "ກ້າມປູ",
+    "en": "Crab Claw",
+    "price": 10000,
+    "cat": "dimsum",
+    "th": "ก้ามปู",
+    "zh": "蟹钳",
+    "vi": "Càng cua"
+  },
+  "ds11": {
+    "name": "ກຸ້ງ",
+    "en": "Shrimp",
+    "price": 10000,
+    "cat": "dimsum",
+    "th": "กุ้ง",
+    "zh": "虾",
+    "vi": "Tôm"
+  },
+  "ds12": {
+    "name": "ຕຸນຕີນໄກ່",
+    "en": "Braised Chicken Feet",
+    "price": 10000,
+    "cat": "dimsum",
+    "th": "ตีนไก่ตุ๋น",
+    "zh": "卤鸡爪",
+    "vi": "Chân gà hầm"
+  },
+  "ds13": {
+    "name": "ຕຸນກະດູກຂ້າງ",
+    "en": "Braised Pork Ribs",
+    "price": 10000,
+    "cat": "dimsum",
+    "th": "ซี่โครงหมูตุ๋น",
+    "zh": "卤排骨",
+    "vi": "Sườn heo hầm"
+  },
+  "ex1": {
+    "name": "ເມນູທັງໝົດສາມາດເພີ່ມໄຂ່ດາວໄດ້",
+    "en": "( All menus can add a star egg )",
+    "price": 5000,
+    "cat": "extra",
+    "th": "ทุกเมนูสามารถเพิ่มไข่ดาวได้",
+    "zh": "所有菜品都可以加煎蛋",
+    "vi": "Tất cả món đều có thể thêm trứng ốp la"
+  }
+};
+
+
+/* Embedded menu photos from uploaded ຮູບ.zip */
+const IMAGE_ASSETS = {
+  "a0": "assets/menu/a0.webp",
+  "a1": "assets/menu/a1.webp",
+  "a2": "assets/menu/a2.webp",
+  "a3": "assets/menu/a3.webp",
+  "a4": "assets/menu/a4.webp",
+  "a5": "assets/menu/a5.webp",
+  "a6": "assets/menu/a6.webp",
+  "a7": "assets/menu/a7.webp",
+  "a8": "assets/menu/a8.webp",
+  "a9": "assets/menu/a9.webp",
+  "a10": "assets/menu/a10.webp",
+  "a11": "assets/menu/a11.webp",
+  "a12": "assets/menu/a12.webp",
+  "a13": "assets/menu/a13.webp",
+  "a14": "assets/menu/a14.webp",
+  "a15": "assets/menu/a15.webp",
+  "a16": "assets/menu/a16.webp",
+  "a17": "assets/menu/a17.webp",
+  "a18": "assets/menu/a18.webp",
+  "a19": "assets/menu/a19.webp",
+  "a20": "assets/menu/a20.webp",
+  "a21": "assets/menu/a21.webp",
+  "a22": "assets/menu/a22.webp",
+  "a23": "assets/menu/a23.webp",
+  "a24": "assets/menu/a24.webp",
+  "a25": "assets/menu/a25.webp",
+  "a26": "assets/menu/a26.webp"
+};
+const MENU_IMAGES = {
+  "fr2": "a3",
+  "nl22": "a4",
+  "nl26": "a6",
+  "nl31": "a2",
+  "nl36": "a7",
+  "nl41": "a1",
+  "nl45": "a5",
+  "nd1": "a8",
+  "nd2": "a9",
+  "nd3": "a10",
+  "nd5": "a0",
+  "nd9": "a11",
+  "rc2": "a12",
+  "rc6": "a13",
+  "rc11": "a14",
+  "rc41": "a17",
+  "rc46": "a15",
+  "rc48": "a16",
+  "rc52": "a18",
+  "ds1": "a19",
+  "ds4": "a20",
+  "ds5": "a21",
+  "ds6": "a22",
+  "ds8": "a23",
+  "ds9": "a24",
+  "ds10": "a25",
+  "ds12": "a26"
+};
+function getMenuImage(id){ return IMAGE_ASSETS[MENU_IMAGES[id]] || ""; }
+
+const PROMOS = { 'MINNI10':10, 'LAOFOOD':15, 'WELCOME':20, 'NOODLE5':5 };
+
+const QR_INFO = {
+  bcel:     { icon:'🏦', label:'BCEL One',  bank:'ທະນາຄານ BCEL',        acc:'0001-023-456789-01' },
+};
+
+const DELIVERY_FEE  = 15000;
+const SHOP_OPEN     = 7;
+const SHOP_CLOSE_WD = 20;   // Mon–Fri
+const SHOP_CLOSE_WE = 18;   // Sat–Sun
+const WA_PHONE      = '8562092392253';
+
+const DAY_LO = ['ອາທິດ','ຈັນ','ອັງຄານ','ພຸດ','ພະຫັດ','ສຸກ','ເສົາ'];
+const DAY_TH = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัส','ศุกร์','เสาร์'];
+const DAY_EN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+let orderType   = 'dine';
+let payType     = 'cash';
+let promoDisc   = 0;
+let lang        = 'lo';
+let deferredPWA = null;
+let currentQrTab = 'bcel';
+
+/* ═══════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════ */
+const G  = id => document.getElementById(id);
+const fmt = n => n.toLocaleString('lo-LA');
+const pad = n => String(n).padStart(2,'0');
+const getQty  = id => Math.max(0, parseInt(G(id).value)       || 0);
+const getNote = id => (G('note-' + id)?.value || '').trim();
+
+/* ═══════════════════════════════════════
+   STABLE LANGUAGE SWITCHER
+═══════════════════════════════════════ */
+const LANGS = ['lo','th','zh','vi','en'];
+
+function toggleLang() {
+  const select = G('langSelect');
+  if (!select) return;
+  const i = LANGS.indexOf(lang);
+  const next = LANGS[(i + 1 + LANGS.length) % LANGS.length];
+  setLang(next);
+}
+
+function setLang(next) {
+  if (!LANGS.includes(next)) return;
+  lang = next;
+  try { localStorage.setItem('menuLang', lang); } catch(e) {}
+  const select = G('langSelect');
+  if (select && select.value !== lang) select.value = lang;
+  applyLang();
+}
+
+function updateDynamicMenuLanguage() {
+  Object.entries(MENU || {}).forEach(([id, m]) => {
+    const card = G('card-' + id);
+    if (!card) return;
+    const nameEl = card.querySelector('.menu-name');
+    const priceEl = card.querySelector('.menu-price');
+    const noteEl = card.querySelector('.note-input');
+    const soldEl = card.querySelector('.so-label');
+    if (nameEl) nameEl.textContent = lang === 'lo' ? m.name : (m[lang] || m.en || m.name);
+    if (priceEl) priceEl.textContent = fmt(m.price) + ' ' + ({lo:'ກີບ',th:'กีบ',zh:'基普',vi:'LAK',en:'LAK'}[lang] || 'LAK');
+    if (noteEl) noteEl.placeholder = ({lo:'ໝາຍເຫດ / Note...',th:'หมายเหตุ / Note...',zh:'备注 / Note...',vi:'Ghi chú / Note...',en:'Note...'}[lang] || 'Note...');
+    if (soldEl) soldEl.textContent = ({lo:'ໝົດແລ້ວ',th:'หมดแล้ว',zh:'售罄',vi:'Hết món',en:'Sold Out'}[lang] || 'Sold Out');
+  });
+
+  document.querySelectorAll('.menu-category-title span').forEach(el => {
+    const map = {
+      lo: el.dataset.lo || '',
+      th: el.dataset.th || el.dataset.lo || '',
+      zh: el.dataset.zh || el.dataset.en || el.dataset.lo || '',
+      vi: el.dataset.vi || el.dataset.en || el.dataset.lo || '',
+      en: el.dataset.en || el.dataset.th || el.dataset.lo || ''
+    };
+    el.textContent = map[lang] || map.lo;
+  });
+}
+
+/* COMPLETE MULTILINGUAL UI + MENU TRANSLATIONS */
+const UI_I18N={
+lo:{tagline:'ອາຫານແຊບ · ສົດໃໝ່ທຸກຈານ · ສົ່ງໄວ',rating:'⭐ 4.9 (328 ລີວິວ)',time:'⏱ 15–30 ນາທີ',free:'🛵 ສົ່ງຟຣີ',hero:'🍜 ອາຫານສົດໃໝ່ ສັ່ງງ່າຍ ໄດ້ໄວ',sub:'ເລືອກເມນູ · ກຳນົດຈຳນວນ · ສົ່ງອໍເດີຜ່ານ WhatsApp',install:'ຕິດຕັ້ງແອັບໄດ້ທັນທີ!',installSub:'ໃຊ້ງານຄືແອັບ ບໍ່ຕ້ອງດາວໂຫຼດ',installBtn:'ຕິດຕັ້ງ',order:'ປະເພດການສັ່ງ',dine:'ນັ່ງກິນຢູ່ຮ້ານ',delivery:'ສົ່ງເຖິງບ້ານ',pickup:'ຮັບດ້ວຍຕົນເອງ',customer:'ຂໍ້ມູນຜູ້ສັ່ງ',choose:'ເລືອກເມນູ',all:'ທັງໝົດ',soup:'ແກງ',fried:'ເຂົ້າຜັດ',noodles:'ຜັດເສັ້ນ',wonton:'ໝີ່ກ້ຽວ',rice:'ເຂົ້າລາດໜ້າ',dimsum:'ຕິ່ມຊຳ',extra:'ເພີ່ມເຕີມ',special:'ຄຳຮ້ອງຂໍພິເສດ',promo:'ໂປໂມຊັນ',apply:'ນຳໃຊ້',payment:'ວິທີຊຳລະເງິນ',cash:'ເງິນສົດ',transfer:'ໂອນເງິນ',note:'ໝາຍເຫດ / Note...',sold:'ໝົດແລ້ວ',freeWord:'ຟຣີ',items:'ລາຍການ',shipping:'ຄ່າສົ່ງ',discount:'ສ່ວນຫຼຸດ',total:'ລາຄາລວມ',cart:'ຕະກ້າ',send:'ສົ່ງອໍເດີ'},
+th:{tagline:'อร่อย · สดใหม่ทุกจาน · ส่งไว',rating:'⭐ 4.9 (328 รีวิว)',time:'⏱ 15–30 นาที',free:'🛵 ส่งฟรี',hero:'🍜 สดใหม่ทุกจาน สั่งง่าย ได้ไว',sub:'เลือกเมนู · กำหนดจำนวน · ส่งออเดอร์ผ่าน WhatsApp',install:'ติดตั้งแอปได้ทันที!',installSub:'ใช้งานเหมือนแอป ไม่ต้องดาวน์โหลด',installBtn:'ติดตั้ง',order:'ประเภทการสั่ง',dine:'นั่งทานที่ร้าน',delivery:'ส่งถึงบ้าน',pickup:'รับด้วยตัวเอง',customer:'ข้อมูลผู้สั่ง',choose:'เลือกเมนู',all:'ทั้งหมด',soup:'แกง',fried:'ข้าวผัด',noodles:'ผัดเส้น',wonton:'บะหมี่เกี๊ยว',rice:'ข้าวราดหน้า',dimsum:'ติ่มซำ',extra:'เพิ่มเติม',special:'คำขอพิเศษ',promo:'โปรโมชั่น',apply:'ใช้โปรโมชั่น',payment:'วิธีชำระเงิน',cash:'เงินสด',transfer:'โอนเงิน',note:'หมายเหตุ / Note...',sold:'หมดแล้ว',freeWord:'ฟรี',items:'รายการ',shipping:'ค่าส่ง',discount:'ส่วนลด',total:'ราคารวม',cart:'ตะกร้า',send:'ส่งออเดอร์'},
+zh:{tagline:'美味 · 每份新鲜 · 快速配送',rating:'⭐ 4.9（328 条评价）',time:'⏱ 15–30 分钟',free:'🛵 免费配送',hero:'🍜 新鲜现做，点餐简单，快速送达',sub:'选择菜品 · 设置数量 · 通过 WhatsApp 发送订单',install:'立即安装应用！',installSub:'像应用一样使用，无需下载',installBtn:'安装',order:'点餐方式',dine:'店内用餐',delivery:'送货上门',pickup:'到店自取',customer:'顾客信息',choose:'选择菜品',all:'全部',soup:'汤类',fried:'炒饭',noodles:'炒面',wonton:'面食',rice:'盖饭',dimsum:'点心',extra:'其他',special:'特殊要求',promo:'优惠活动',apply:'使用',payment:'支付方式',cash:'现金',transfer:'转账',note:'备注 / Note...',sold:'售罄',freeWord:'免费',items:'项',shipping:'配送费',discount:'折扣',total:'总价',cart:'购物车',send:'发送订单'},
+vi:{tagline:'Ngon · Tươi mới mỗi món · Giao nhanh',rating:'⭐ 4.9 (328 đánh giá)',time:'⏱ 15–30 phút',free:'🛵 Miễn phí giao hàng',hero:'🍜 Tươi ngon mỗi món, đặt dễ, giao nhanh',sub:'Chọn món · Chọn số lượng · Gửi đơn qua WhatsApp',install:'Cài đặt ứng dụng ngay!',installSub:'Dùng như ứng dụng, không cần tải xuống',installBtn:'Cài đặt',order:'Hình thức đặt món',dine:'Ăn tại quán',delivery:'Giao tận nhà',pickup:'Tự đến nhận',customer:'Thông tin khách hàng',choose:'Chọn món',all:'Tất cả',soup:'Món canh',fried:'Cơm chiên',noodles:'Mì xào',wonton:'Mì hoành thánh',rice:'Cơm món',dimsum:'Dim sum',extra:'Thêm',special:'Yêu cầu đặc biệt',promo:'Khuyến mãi',apply:'Áp dụng',payment:'Phương thức thanh toán',cash:'Tiền mặt',transfer:'Chuyển khoản',note:'Ghi chú / Note...',sold:'Hết món',freeWord:'Miễn phí',items:'món',shipping:'Phí giao hàng',discount:'Giảm giá',total:'Tổng cộng',cart:'Giỏ hàng',send:'Gửi đơn'},
+en:{tagline:'Delicious · Fresh every dish · Fast delivery',rating:'⭐ 4.9 (328 reviews)',time:'⏱ 15–30 min',free:'🛵 Free delivery',hero:'🍜 Fresh food, easy ordering, fast delivery',sub:'Choose menu · Set quantity · Send order via WhatsApp',install:'Install the app instantly!',installSub:'Use it like an app, no download needed',installBtn:'Install',order:'Order type',dine:'Dine in',delivery:'Delivery',pickup:'Pickup',customer:'Customer information',choose:'Choose menu',all:'All',soup:'Soups',fried:'Fried rice',noodles:'Stir-fried noodles',wonton:'Noodles & wontons',rice:'Rice dishes',dimsum:'Dim sum',extra:'Extras',special:'Special request',promo:'Promotion',apply:'Apply',payment:'Payment method',cash:'Cash',transfer:'Bank transfer',note:'Note...',sold:'Sold out',freeWord:'Free',items:'items',shipping:'Delivery fee',discount:'Discount',total:'Total',cart:'Cart',send:'Send order'}
+};
+const CAT_I18N={soup:'soup',friedrice:'fried',noodles:'noodles',noodledish:'wonton',rice:'rice',dimsum:'dimsum',extra:'extra'};
+function completeMenuText(m,lg){ return lg==='lo'?m.name:(m[lg]||m.en||m.name); }
+function translatedDesc(m,lg){ if(lg==='lo') return ''; return completeMenuText(m,lg); }
+function applyCompleteUI(){
+ const u=UI_I18N[lang]||UI_I18N.lo;
+ const set=(sel,val)=>document.querySelectorAll(sel).forEach(e=>e.textContent=val);
+ set('.logo-tagline',u.tagline); set('.hero-title',u.hero); set('.hero-sub',u.sub);
+ const pills=document.querySelectorAll('.h-pill'); if(pills[0])pills[0].textContent=u.rating; if(pills[1])pills[1].textContent=u.time; if(pills[2])pills[2].textContent=u.free;
+ const ib=document.querySelector('.ib-text'); if(ib){const x=ib.querySelector('span');if(x)x.textContent=u.install; const sub=ib.querySelector('.ib-sub');if(sub)sub.textContent=u.installSub;} set('#installBtn',u.installBtn);
+ const sm=document.querySelectorAll('.slabel'); const labels=[u.order,u.customer,u.choose,u.special,u.promo,u.payment]; sm.forEach((e,i)=>{if(labels[i])e.textContent=labels[i];});
+ const ob={btnDine:u.dine,btnDelivery:u.delivery,btnPickup:u.pickup}; Object.entries(ob).forEach(([id,t])=>{const e=G(id);if(e){const sp=e.querySelector('span');if(sp)sp.textContent=t;else e.textContent=t;}});
+ const cats={all:u.all,soup:u.soup,friedrice:u.fried,noodles:u.noodles,noodledish:u.wonton,rice:u.rice,dimsum:u.dimsum,extra:u.extra}; document.querySelectorAll('.cat-tab').forEach(b=>{const c=b.dataset.cat||'';const sp=b.querySelector('span');if(sp&&cats[c])sp.textContent=cats[c];});
+ const promo=document.querySelector('.promo-apply');if(promo)promo.textContent=u.apply;
+ const pay={cash:u.cash,transfer:u.transfer}; const pc=G('pay-cash');if(pc&&pc.querySelector('span:last-child'))pc.querySelector('span:last-child').textContent=u.cash; const pt=G('pay-transfer');if(pt&&pt.querySelector('span:last-child'))pt.querySelector('span:last-child').textContent=u.transfer;
+ document.querySelectorAll('.note-input').forEach(e=>e.placeholder=u.note); document.querySelectorAll('.so-label').forEach(e=>e.textContent=u.sold);
+ const cur=lang==='lo'?'ກີບ':lang==='th'?'กีบ':lang==='zh'?'基普':'LAK'; document.querySelectorAll('.menu-price').forEach(e=>{const id=e.closest('.menu-card')?.id?.replace('card-',''); if(id&&MENU[id])e.textContent=fmt(MENU[id].price)+' '+cur;});
+}
+const oldUpdateDynamicMenuLanguage=updateDynamicMenuLanguage;
+function updateDynamicMenuLanguage(){
+ Object.entries(MENU||{}).forEach(([id,m])=>{const card=G('card-'+id);if(!card)return;const n=card.querySelector('.menu-name'),d=card.querySelector('.menu-desc'),p=card.querySelector('.menu-price'),note=card.querySelector('.note-input'),sold=card.querySelector('.so-label');if(n)n.textContent=completeMenuText(m,lang);if(d)d.textContent=translatedDesc(m,lang);if(p)p.textContent=fmt(m.price)+' '+(lang==='lo'?'ກີບ':lang==='th'?'กีบ':lang==='zh'?'基普':'LAK');if(note)note.placeholder=(UI_I18N[lang]||UI_I18N.lo).note;if(sold)sold.textContent=(UI_I18N[lang]||UI_I18N.lo).sold;});
+ document.querySelectorAll('.menu-category-title span').forEach(el=>{const c=el.closest('.menu-category-title')?.dataset?.cat;}); applyCompleteUI();
+}
+function applyLang() {
+  const labels={lo:'🌐 ລາວ',th:'🌐 ไทย',zh:'🌐 中文',vi:'🌐 Tiếng Việt',en:'🌐 English'};
+  const select=G('langSelect');
+  if(select) select.value=lang;
+  const lf=G('langFlag'); if(lf) lf.textContent=({lo:'🇱🇦',th:'🇹🇭',zh:'🇨🇳',vi:'🇻🇳',en:'🇬🇧'})[lang] || '🌐';
+  document.documentElement.lang=lang;
+  const titles={lo:'ອາຫານຕາມສັ່ງ',th:'อาหารตามสั่ง',zh:'点餐美食',vi:'Món ăn theo yêu cầu',en:'Made-to-Order Food'};
+  document.title=titles[lang] || titles.lo;
+  const desc={lo:'ອາຫານຕາມສັ່ງ ສົດໃໝ່ທຸກຈານ ສົ່ງໄວ ຜ່ານ WhatsApp',th:'อาหารตามสั่ง สดใหม่ทุกจาน ส่งเร็ว ผ่าน WhatsApp',zh:'现点现做，每份新鲜，WhatsApp 快速配送',vi:'Món ăn gọi theo yêu cầu, tươi ngon, giao nhanh qua WhatsApp',en:'Made-to-order food, fresh every dish, fast delivery via WhatsApp'};
+  const meta=document.querySelector('meta[name="description"]'); if(meta) meta.content=desc[lang] || desc.lo;
+  document.querySelectorAll('[data-lo]').forEach(el=>{
+    const value=el.dataset[lang] || el.dataset.en || el.dataset.th || el.dataset.lo || '';
+    el.textContent=value;
+  });
+  _updateFieldPlaceholders();
+  updateDynamicMenuLanguage();
+  updateClock();
+  refresh();
+}
+
+function _updateFieldPlaceholders() {
+  const ni=G('customerName'); if(!ni)return;
+  if(orderType==='dine') ni.placeholder={lo:'ເບີໂຕະ ຫຼື ຊື່ລູກຄ້າ',th:'หมายเลขโต๊ะ หรือ ชื่อลูกค้า',zh:'桌号或顾客姓名',vi:'Số bàn hoặc tên khách',en:'Table number or customer name'}[lang];
+  else ni.placeholder={lo:'ຊື່ຜູ້ສັ່ງ',th:'ชื่อผู้สั่ง',zh:'顾客姓名',vi:'Tên khách hàng',en:'Customer name'}[lang];
+}
+
+
+/* Override language application with complete UI translations */
+const _baseApplyLang = applyLang;
+applyLang = function(){ _baseApplyLang(); updateDynamicMenuLanguage(); applyCompleteUI(); };
+/* ═══════════════════════════════════════
+   ORDER TYPE
+═══════════════════════════════════════ */
+function setOrderType(type) {
+  orderType = type;
+  ['Dine','Delivery','Pickup'].forEach(t =>
+    G('btn'+t).classList.toggle('active', t.toLowerCase() === type));
+
+  const phone   = G('phoneField');
+  const address = G('addressField');
+  const icon    = G('fcIcon');
+
+  if (type === 'delivery') {
+    phone.style.display = address.style.display = '';
+    icon.textContent = '👤';
+    G('pinFieldBlock').style.display = '';
+  } else if (type === 'pickup') {
+    phone.style.display   = '';
+    address.style.display = 'none';
+    icon.textContent = '👤';
+    G('pinFieldBlock').style.display = 'none';
+  } else {
+    phone.style.display = address.style.display = 'none';
+    icon.textContent = '🪑';
+    G('pinFieldBlock').style.display = 'none';
+  }
+
+  G('feeRow').style.display = type === 'delivery' ? '' : 'none';
+  _updateFieldPlaceholders();
+  refresh();
+}
+
+/* ═══════════════════════════════════════
+   PAYMENT
+═══════════════════════════════════════ */
+function setPayment(type) {
+  payType = type;
+  ['cash','bcel','lao','transfer'].forEach(t =>
+    G('pay-'+t).classList.toggle('active', t === type));
+  G('qrHint').classList.toggle('show', type !== 'cash');
+}
+
+/* ═══════════════════════════════════════
+   PROMO CODE
+═══════════════════════════════════════ */
+function applyPromo() {
+  const code = G('promoCode').value.trim().toUpperCase();
+  const msg  = G('promoMsg');
+  if (PROMOS[code]) {
+    promoDisc = PROMOS[code];
+    msg.className   = 'promo-msg ok';
+    msg.textContent = `✅ ສ່ວນຫຼຸດ ${promoDisc}% ນຳໃຊ້ສຳເລັດ!`;
+    msg.style.display = 'block';
+    showToast(`🎉 ໂປໂມ ${code} — ຫຼຸດ ${promoDisc}%`);
+  } else {
+    promoDisc = 0;
+    msg.className   = 'promo-msg err';
+    msg.textContent = '❌ ລະຫັດບໍ່ຖືກຕ້ອງ';
+    msg.style.display = 'block';
+    showToast('⚠️ ລະຫັດໂປໂມຊັນບໍ່ຖືກຕ້ອງ');
+  }
+  refresh();
+}
+
+/* ═══════════════════════════════════════
+   CATEGORY FILTER
+═══════════════════════════════════════ */
+function filterCat(cat, btn) {
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const groups = ['soup','friedrice','noodles','noodledish','rice','dimsum','extra'];
+  groups.forEach(g => {
+    const el = G('group-'+g);
+    if (el) el.style.display = (cat === 'all' || cat === g) ? '' : 'none';
+  });
+
+  // When a specific menu category is selected, keep the page focused on menus
+  // by hiding Special Request / Promotion / Payment Method. Show them again on All.
+  document.querySelectorAll('.order-extra-section').forEach(el => {
+    el.classList.toggle('category-hidden', cat !== 'all');
+  });
+}
+
+/* ═══════════════════════════════════════
+   QTY CONTROLS
+═══════════════════════════════════════ */
+function changeQty(id, delta) {
+  const el  = G(id);
+  const val = Math.max(0, (parseInt(el.value) || 0) + delta);
+  el.value  = val;
+  const disp = G('d-'+id);
+  if (disp) {
+    disp.textContent = val;
+    disp.classList.remove('qbounce');
+    void disp.offsetWidth;
+    disp.classList.add('qbounce');
+  }
+  refresh();
+  if (delta > 0) showToast(MENU[id].name + ' +1 ✓');
+}
+
+/* ═══════════════════════════════════════
+   REFRESH / RECALCULATE
+═══════════════════════════════════════ */
+function refresh() {
+  let subtotal = 0, qty = 0;
+  const rows = G('sumRows');
+  rows.innerHTML = '';
+
+  for (const id in MENU) {
+    const q    = getQty(id);
+    const note = getNote(id);
+    const card = G('card-'+id);
+    if (q > 0) {
+      card.classList.add('active');
+      const sub = q * MENU[id].price;
+      qty      += q;
+      subtotal += sub;
+      const row = document.createElement('div');
+      row.className = 'sum-row';
+      row.innerHTML = `
+        <div class="sr-left">
+          <strong>${MENU[id].name} × ${q}</strong>
+          ${note ? `<div class="rn">📝 ${note}</div>` : ''}
+        </div>
+        <div class="sr-right">${fmt(sub)} ກີບ</div>`;
+      rows.appendChild(row);
+    } else {
+      card.classList.remove('active');
+    }
+  }
+
+  /* fees & discounts */
+  const fee  = orderType === 'delivery' ? DELIVERY_FEE : 0;
+  const disc = (promoDisc && qty > 0) ? Math.round(subtotal * promoDisc / 100) : 0;
+  const total = subtotal + fee - disc;
+
+  G('feeVal').textContent = fee > 0 ? fmt(fee) + ' ກີບ' : 'ຟຣີ';
+
+  const dRow = G('discRow');
+  if (disc > 0) {
+    dRow.style.display = 'flex';
+    G('discVal').textContent = `- ${fmt(disc)} ກີບ (${promoDisc}%)`;
+  } else {
+    dRow.style.display = 'none';
+  }
+
+  /* summary */
+  G('sumCount').textContent  = qty + ' ລາຍການ';
+  G('emptyHint').style.display = qty === 0 ? 'flex' : 'none';
+
+  /* total with bump */
+  const tEl = G('total');
+  tEl.classList.remove('bump');
+  void tEl.offsetWidth;
+  tEl.textContent = fmt(total);
+  if (qty > 0) tEl.classList.add('bump');
+
+  /* sticky bar */
+  G('stickyCount').textContent = qty + ' ລາຍການ';
+  G('stickyTotal').textContent = fmt(total);
+  G('stickyBar').classList.toggle('visible', qty > 0);
+
+  /* QR amount */
+  G('qrAmt').textContent = fmt(total);
+}
+
+/* ═══════════════════════════════════════
+   CART DRAWER
+═══════════════════════════════════════ */
+function openCartDrawer() {
+  const body = G('drawerBody');
+  body.innerHTML = '';
+  let total = 0, count = 0;
+
+  for (const id in MENU) {
+    const q    = getQty(id);
+    const note = getNote(id);
+    if (q > 0) {
+      const sub = q * MENU[id].price;
+      total += sub; count += q;
+      const el = document.createElement('div');
+      el.className = 'di';
+      el.innerHTML = `
+        <div class="di-info">
+          <div class="di-name">${MENU[id].name} × ${q}</div>
+          ${note ? `<div class="di-note">📝 ${note}</div>` : ''}
+        </div>
+        <div class="di-price">${fmt(sub)} ກີບ</div>`;
+      body.appendChild(el);
+    }
+  }
+
+  if (!count) {
+    body.innerHTML = '<div class="drawer-empty"><span class="de-icon">🛒</span>ຍັງບໍ່ທັນເລືອກເມນູ</div>';
+  }
+
+  G('drawerTotal').textContent = fmt(total);
+  G('drawerOverlay').classList.add('open');
+  G('cartDrawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCartDrawer() {
+  G('drawerOverlay').classList.remove('open');
+  G('cartDrawer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* swipe-down to close */
+let _swipeY = 0;
+G('cartDrawer').addEventListener('touchstart', e => { _swipeY = e.touches[0].clientY; }, { passive: true });
+G('cartDrawer').addEventListener('touchend',   e => {
+  if (e.changedTouches[0].clientY - _swipeY > 80) closeCartDrawer();
+}, { passive: true });
+
+/* ═══════════════════════════════════════
+   QR MODAL
+═══════════════════════════════════════ */
+function openQrModal() {
+  const tab = (payType !== 'cash') ? payType : 'bcel';
+  _renderQrTab(tab);
+  /* activate correct tab button */
+  document.querySelectorAll('.mtab').forEach((btn, i) => {
+    const tabs = ['bcel','lao','transfer'];
+    btn.classList.toggle('active', tabs[i] === tab);
+  });
+  G('qrOv').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeQrModal() {
+  G('qrOv').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleQrOvClick(e) {
+  if (e.target === G('qrOv')) closeQrModal();
+}
+
+function switchQrTab(type, btn) {
+  currentQrTab = type;
+  document.querySelectorAll('.mtab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  _renderQrTab(type);
+}
+
+function _renderQrTab(type) {
+  currentQrTab = type;
+  const info = QR_INFO[type] || QR_INFO.bcel;
+  G('qrIcon').textContent  = info.icon;
+  G('qrLabel').textContent = info.label;
+  G('qrBank').textContent  = info.bank;
+  G('qrAcc').textContent   = 'ເລກບັນຊີ: ' + info.acc;
+}
+
+function copyAcc() {
+  const acc = QR_INFO[currentQrTab]?.acc || '';
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(acc)
+      .then(() => showToast('📋 ຄັດລອກ ' + acc))
+      .catch(() => showToast('📋 ' + acc));
+  } else {
+    showToast('📋 ' + acc);
+  }
+}
+
+/* ═══════════════════════════════════════
+   BUILD & SEND ORDER
+═══════════════════════════════════════ */
+function _calcTotals() {
+  let subtotal = 0, qty = 0;
+  const items = [];
+  for (const id in MENU) {
+    const q = getQty(id);
+    if (q > 0) {
+      const sub = q * MENU[id].price;
+      items.push({ id, q, note: getNote(id), sub });
+      subtotal += sub; qty += q;
+    }
+  }
+  const fee   = orderType === 'delivery' ? DELIVERY_FEE : 0;
+  const disc  = (promoDisc && qty > 0) ? Math.round(subtotal * promoDisc / 100) : 0;
+  const total = subtotal + fee - disc;
+  return { items, subtotal, fee, disc, total, qty };
+}
+
+function clearCurrentOrder() {
+  let hasItems = false;
+  for (const id in MENU) {
+    const el = G(id);
+    if (el && getQty(id) > 0) hasItems = true;
+    if (el) el.value = 0;
+    const disp = G('d-' + id);
+    if (disp) disp.textContent = '0';
+    const note = G('note-' + id);
+    if (note) note.value = '';
+  }
+  promoDisc = 0;
+  const promoInput = G('promoCode');
+  if (promoInput) promoInput.value = '';
+  const promoMsg = G('promoMsg');
+  if (promoMsg) promoMsg.textContent = '';
+  refresh();
+  openCartDrawer();
+  closeCartDrawer();
+  showToast(hasItems ? '🗑️ ເຄຍອໍເດີ້ແລ້ວ' : '🗑️ ອໍເດີ້ຫວ່າງແລ້ວ');
+}
+
+function sendOrder() {
+  const { items, fee, disc, total, qty } = _calcTotals();
+
+  if (!qty) {
+    showToast('⚠️ ກະລຸນາເລືອກເມນູຢ່າງໜ້ອຍ 1 ລາຍການ');
+    return;
+  }
+
+  const name    = G('customerName').value.trim()   || '-';
+  const phone   = G('customerPhone')?.value.trim() || '';
+  const address = G('customerAddress')?.value.trim() || '';
+  const special = G('specialReq').value.trim();
+
+  const typeLabel = { dine:'🪑 ນັ່ງທານຢູ່ຮ້ານ', delivery:'🛵 ສົ່ງເຖິງບ້ານ', pickup:'🥡 ຮັບດ້ວຍຕົນເອງ' }[orderType];
+  const payLabel  = { cash:'💵 ເງິນສົດ', bcel:'🏦 BCEL One' }[payType];
+
+  const now  = new Date();
+  const time = now.toLocaleTimeString('lo-LA', { hour:'2-digit', minute:'2-digit' });
+  const date = now.toLocaleDateString('lo-LA');
+
+  const lines = [
+`╔══════════════════════╗
+   📋 ອໍເດີໃໝ່  ⏰ ${time}  📅 ${date}
+╚══════════════════════╝`,
+`${typeLabel}  |  ${payLabel}`,
+`👤 ຊື່ / ໂຕະ : ${name}`,
+phone   ? `📞 ໂທ      : ${phone}`   : null,
+address ? `📍 ທີ່ຢູ່   : ${address}` : null,
+`──────────────────────`,
+...items.map(i => {
+  let l = `${MENU[i.id].name} × ${i.q}  =  ${fmt(i.sub)} ກີບ`;
+  if (i.note) l += `\n   📝 ${i.note}`;
+  return l;
+}),
+`──────────────────────`,
+fee  > 0 ? `🛵 ຄ່າສົ່ງ       : ${fmt(fee)} ກີບ` : null,
+disc > 0 ? `🎁 ສ່ວນຫຼຸດ ${promoDisc}%  : - ${fmt(disc)} ກີບ` : null,
+`📦 ລວມ           : ${qty} ລາຍການ`,
+`💰 ທັງໝົດ       : ${fmt(total)} ກີບ`,
+special ? `\n💬 ຄຳຮ້ອງ: ${special}` : null,
+  ].filter(Boolean).join('\n');
+
+  const encoded = encodeURIComponent(lines);
+  // Try whatsapp:// deep link first (opens app directly), fallback to wa.me
+  const deepLink = `whatsapp://send?phone=${WA_PHONE}&text=${encoded}`;
+  const webLink  = `https://wa.me/${WA_PHONE}?text=${encoded}`;
+
+  // On mobile: deep link opens app directly
+  // On desktop: attempt deep link, if it fails (after 1.5s) open web fallback
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (isMobile) {
+    window.location.href = deepLink;
+  } else {
+    const start = Date.now();
+    window.location.href = deepLink;
+    setTimeout(() => {
+      if (Date.now() - start < 2000) {
+        window.open(webLink, '_blank');
+      }
+    }, 1500);
+  }
+}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+let _toastTimer;
+function showToast(msg) {
+  const t = G('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ═══════════════════════════════════════
+   CLOCK + SHOP STATUS + COUNTDOWN
+═══════════════════════════════════════ */
+function updateClock() {
+  const now  = new Date();
+  const h    = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+  const day  = now.getDay();
+  const days = lang === 'lo' ? DAY_LO : (lang === 'th' ? DAY_TH : (lang === 'zh' ? ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'] : (lang === 'vi' ? ['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy'] : DAY_EN)));
+  const closeH = (day === 0 || day === 6) ? SHOP_CLOSE_WE : SHOP_CLOSE_WD;
+  const isOpen = h >= SHOP_OPEN && h < closeH;
+
+  G('headerClock').innerHTML = `${days[day]}<br>${pad(h)}:${pad(m)}:${pad(s)}`;
+
+  const dot  = G('statusDot');
+  const txt  = G('statusText');
+  if (isOpen) {
+    dot.classList.remove('closed');
+    txt.textContent = {lo:'ຮ້ານເປີດຢູ່', th:'ร้านเปิดอยู่', zh:'营业中', vi:'Đang mở cửa', en:'Open now'}[lang];
+  } else {
+    dot.classList.add('closed');
+    const next = h < SHOP_OPEN
+      ? `${lang === 'lo' ? 'ເປີດ' : (lang === 'th' ? 'เปิด' : (lang === 'zh' ? '营业' : (lang === 'vi' ? 'Mở cửa' : 'Open')))} ${pad(SHOP_OPEN)}:00`
+      : ({lo:'ເປີດ 07:00 ມື້ອ່ືນ',th:'เปิด 07:00 พรุ่งนี้',zh:'明天 07:00 营业',vi:'Mở cửa 07:00 ngày mai',en:'Open 07:00 tomorrow'}[lang]);
+    txt.textContent = ({lo:'ຮ້ານປິດ · ',th:'ร้านปิด · ',zh:'已打烊 · ',vi:'Đã đóng cửa · ',en:'Closed · '}[lang]) + next;
+  }
+
+  /* countdown: show if shop opens in <60 min OR closes in <60 min */
+  const cdBar   = G('cdBar');
+  const totalSec = h * 3600 + m * 60 + s;
+  let targetSec  = -1, cdMsg = '';
+
+  if (!isOpen && h < SHOP_OPEN) {
+    targetSec = SHOP_OPEN * 3600;
+    cdMsg = {lo:'⏰ ເປີດໃນ: ',th:'⏰ เปิดใน: ',zh:'⏰ 距离开店: ',vi:'⏰ Mở cửa sau: ',en:'⏰ Opens in: '}[lang];
+  } else if (isOpen && (closeH * 3600 - totalSec) <= 3600) {
+    targetSec = closeH * 3600;
+    cdMsg = {lo:'⚡ ປິດໃນ: ',th:'⚡ ปิดใน: ',zh:'⚡ 距离关店: ',vi:'⚡ Đóng cửa sau: ',en:'⚡ Closes in: '}[lang];
+  }
+
+  if (targetSec > 0) {
+    const diff = targetSec - totalSec;
+    if (diff > 0) {
+      G('cdLabel').textContent = cdMsg;
+      G('cdTime').textContent  = `${pad(Math.floor(diff/60))}:${pad(diff%60)}`;
+      cdBar.classList.add('show');
+    } else {
+      cdBar.classList.remove('show');
+    }
+  } else {
+    cdBar.classList.remove('show');
+  }
+}
+
+/* ═══════════════════════════════════════
+   PWA
+═══════════════════════════════════════ */
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPWA = e;
+  G('installBanner').classList.add('show');
+});
+
+G('installBtn').addEventListener('click', async () => {
+  if (!deferredPWA) return;
+  deferredPWA.prompt();
+  const { outcome } = await deferredPWA.userChoice;
+  if (outcome === 'accepted') {
+    G('installBanner').classList.remove('show');
+    showToast('📲 ຕິດຕັ້ງສຳເລັດ!');
+  }
+  deferredPWA = null;
+});
+
+window.addEventListener('appinstalled', () => {
+  G('installBanner').classList.remove('show');
+  showToast('🎉 ຕິດຕັ້ງແອັບສຳເລັດ!');
+});
+
+/* ═══════════════════════════════════════
+   SERVICE WORKER
+═══════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(r  => console.log('[SW] scope:', r.scope))
+      .catch(e => console.warn('[SW] failed:', e));
+  });
+}
+
+
+/* ─── MENU PHOTO VIEWER ─── */
+function openPhotoViewer(id){
+  const src = (typeof getMenuImage === 'function') ? getMenuImage(id) : '';
+  const item = (typeof MENU === 'object' && MENU[id]) ? MENU[id] : null;
+  const viewer=G('photoViewer'), img=G('photoViewerImg'), label=G('photoViewerTitle');
+  if(!viewer || !img || !src) return;
+  img.src=src;
+  img.alt=item ? item.name : '';
+  if(label) label.textContent=item ? item.name : '';
+  viewer.classList.add('show');
+  viewer.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+}
+function closePhotoViewer(){
+  const viewer=G('photoViewer'), img=G('photoViewerImg');
+  if(!viewer) return;
+  viewer.classList.remove('show');
+  viewer.setAttribute('aria-hidden','true');
+  document.body.style.overflow='';
+  if(img) img.src='';
+}
+(function initPhotoViewer(){
+  const root=G('menuGroups'), viewer=G('photoViewer');
+  if(root) root.addEventListener('click', function(e){
+    const btn=e.target.closest('.photo-hit');
+    if(!btn || !root.contains(btn)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    openPhotoViewer(btn.dataset.photoId);
+  });
+  if(viewer) viewer.addEventListener('click', function(e){
+    if(e.target===viewer || e.target.classList.contains('photo-viewer-close')) closePhotoViewer();
+  });
+})();
+
+/* ═══════════════════════════════════════
+   KEYBOARD SHORTCUTS
+═══════════════════════════════════════ */
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeCartDrawer(); closeQrModal(); closePinModal(); closeHistModal(); closePhotoViewer(); }
+});
+
+/* ═══════════════════════════════════════
+   AUTO-RESIZE TEXTAREAS
+═══════════════════════════════════════ */
+document.querySelectorAll('textarea').forEach(ta => {
+  ta.addEventListener('input', function () {
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
+  });
+});
+
+/* Stable native select language control */
+(function initLanguageSelect(){
+  const select = G('langSelect');
+  if (!select) return;
+  select.addEventListener('change', function(){
+    setLang(this.value);
+  });
+})();
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+
+/* ─── BUILD MENU FROM EXCEL DATA ─── */
+function renderMenu() {
+  const root = G('menuGroups');
+  if (!root) return;
+  const groups = [
+    ['soup','🍲','ແກງ','Soups'],
+    ['friedrice','🍚','ເຂົ້າຜັດ','Fried Rice'],
+    ['noodles','🍜','ຜັດເສັ້ນ','Noodles'],
+    ['noodledish','🥣','ໝີ່ກ້ຽວ','Noodle Dishes'],
+    ['rice','🍛','ເຂົ້າລາດໜ້າ','Rice Dishes'],
+    ['dimsum','🥟','ຕິ່ມຊຳ','Dim Sum'],
+    ['extra','🍳','ເພີ່ມເຕີມ','Extras']
+  ];
+  root.innerHTML = groups.map(([cat,icon,lo,en]) => {
+    const cards = Object.entries(MENU).filter(([,m]) => m.cat === cat).map(([id,m]) => `
+      <div class="menu-card" id="card-${id}">
+        <div class="sold-out-overlay" id="so-${id}"><span class="so-label">${lang==='lo'?'ໝົດແລ້ວ':lang==='th'?'หมดแล้ว':lang==='zh'?'售罄':lang==='vi'?'Hết món':'Sold Out'}</span></div>
+        <div class="card-top">
+          <div class="menu-img ${getMenuImage(id) ? 'photo-menu' : 'no-photo'}">${getMenuImage(id) ? `<button type="button" class="photo-hit" data-photo-id="${id}" aria-label="View ${String(m.name).replace(/"/g,'&quot;')}"><img src="${getMenuImage(id)}" alt="${m.name}" loading="lazy" decoding="async"></button>` : icon}</div>
+          <div class="menu-info">
+            <div class="menu-name">${lang === 'lo' ? m.name : (m[lang] || m.th || m.en || m.name)}</div>
+            <div class="menu-desc">${lang === 'en' ? (m.en || '') : (m.en || '')}</div>
+            <div class="menu-price">${fmt(m.price)} ${lang === 'lo' ? 'ກີບ' : lang === 'th' ? 'กีบ' : lang === 'zh' ? '基普' : 'LAK'}</div>
+          </div>
+          <div class="qty-ctrl">
+            <button class="qty-btn minus" onclick="changeQty('${id}',-1)" aria-label="ຫຼຸດ">−</button>
+            <span class="qty-disp" id="d-${id}">0</span>
+            <input type="hidden" id="${id}" value="0">
+            <button class="qty-btn" onclick="changeQty('${id}',1)" aria-label="ເພີ່ມ">+</button>
+          </div>
+        </div>
+        <div class="note-row"><textarea class="note-input" id="note-${id}" rows="1" placeholder="${lang==='lo'?'ໝາຍເຫດ / Note...':lang==='th'?'หมายเหตุ / Note...':lang==='zh'?'备注 / Note...':lang==='vi'?'Ghi chú / Note...':'Note...'}"></textarea></div>
+      </div>`).join('');
+    return `
+      <p class="slabel menu-category-title">
+        ${icon} <span data-lo="${lo}" data-th="${en}" data-en="">${lo}</span>
+      </p>
+      <div class="menu-list" id="group-${cat}">${cards}</div>`;
+  }).join('');
+}
+
+try { lang = localStorage.getItem('menuLang') || 'lo'; } catch(e) { lang = 'lo'; }
+if (!LANGS.includes(lang)) lang = 'lo';
+
+function updateLanguageFlag(){const e=document.querySelector('.lang-globe');if(e)e.textContent=({lo:'🇱🇦',th:'🇹🇭',zh:'🇨🇳',vi:'🇻🇳',en:'🇬🇧'}[lang]||'🌐');}
+const _baseSetLang=setLang; setLang=function(next){_baseSetLang(next);updateLanguageFlag();};
+renderMenu();
+applyLang();
+updateClock();
+setInterval(updateClock, 1000);
+loadHistory();
+
+/* ═══════════════════════════════════════
+   SKELETON LOADER
+═══════════════════════════════════════ */
+function showSkeleton() {
+  const sk = G('skeletonLoader');
+  const groups = ['group-soup','group-friedrice','group-noodles','group-noodledish','group-rice','group-dimsum','group-extra'];
+  if (!sk) return;
+  sk.style.display = 'flex';
+  groups.forEach(g => { const el = G(g); if (el) el.style.display = 'none'; });
+}
+function hideSkeleton() {
+  const sk = G('skeletonLoader');
+  if (!sk) return;
+  sk.style.display = 'none';
+  // restore groups to current cat filter state
+  ['soup','friedrice','noodles','noodledish','rice','dimsum','extra'].forEach(g => {
+    const el = G('group-' + g);
+    if (el) el.style.display = '';
+  });
+}
+
+// Show skeleton briefly on first paint, then reveal real content
+showSkeleton();
+requestAnimationFrame(() => requestAnimationFrame(() => {
+  setTimeout(hideSkeleton, 600);
+}));
+
+/* ═══════════════════════════════════════
+   SHARE APP (Web Share API)
+═══════════════════════════════════════ */
+function shareApp() {
+  const data = {
+    title: 'ມິນນີ້ໝີ່ກ້ຽວ — ສັ່ງອາຫານອອນລາຍ',
+    text:  'ສັ່ງອາຫານອອນລາຍ ຮ້ານ ມິນນີ້ໝີ່ກ້ຽວ ວຽງຈັນ — ສົດໃໝ່ ສົ່ງໄວ!',
+    url:   window.location.href
+  };
+  if (navigator.share) {
+    navigator.share(data).catch(() => {});
+  } else {
+    // Fallback: copy link
+    navigator.clipboard?.writeText(window.location.href).then(() => {
+      showToast('📋 ຄັດລອກລິ້ງສຳເລັດ!');
+    }).catch(() => {
+      showToast('🔗 ' + window.location.href);
+    });
+  }
+}
+
+/* ═══════════════════════════════════════
+   PRINT RECEIPT
+═══════════════════════════════════════ */
+function printReceipt() {
+  const { items, fee, disc, total, qty } = _calcTotals();
+  if (!qty) { showToast('⚠️ ກະລຸນາເລືອກເມນູກ່ອນ'); return; }
+  window.print();
+}
+
+/* ═══════════════════════════════════════
+   ORDER HISTORY (localStorage)
+═══════════════════════════════════════ */
+const HIST_KEY    = 'minni_history';
+const MAX_HISTORY = 5;
+const HIST_PIN    = '113322';
+let _histUnlocked = false;
+
+function loadHistory() {
+  _histUnlocked = false;
+  document.getElementById('histContentBox').style.display = 'none';
+}
+
+/* ── open modal ── */
+function openHistModal() {
+  if (_histUnlocked) {
+    // already unlocked — just toggle visibility
+    const box = document.getElementById('histContentBox');
+    box.style.display = box.style.display === 'none' ? '' : 'none';
+    return;
+  }
+  const modal = document.getElementById('histPinModal');
+  const input = document.getElementById('hpmInput');
+  const err   = document.getElementById('hpmErr');
+  if (err)   err.textContent = '';
+  if (input) input.value = '';
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => { if (input) input.focus(); }, 200);
+}
+
+function closeHistModal() {
+  document.getElementById('histPinModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ── verify PIN ── */
+function histUnlock() {
+  const input = document.getElementById('hpmInput');
+  const err   = document.getElementById('hpmErr');
+  if (!input) return;
+
+  const val = input.value.trim();
+
+  if (val === HIST_PIN) {
+    _histUnlocked = true;
+    input.value = '';
+    closeHistModal();
+    document.getElementById('histContentBox').style.display = '';
+    _renderHistory();
+    showToast('🔓 ເປີດປະຫວັດສຳເລັດ');
+  } else {
+    if (err) err.textContent = '❌ ລະຫັດບໍ່ຖືກຕ້ອງ — ລອງໃໝ່';
+    input.classList.add('shake');
+    input.value = '';
+    input.focus();
+    haptic(40);
+    setTimeout(() => {
+      input.classList.remove('shake');
+      if (err) err.textContent = '';
+    }, 600);
+  }
+}
+
+/* ── lock again ── */
+function histLock() {
+  _histUnlocked = false;
+  document.getElementById('histContentBox').style.display = 'none';
+  showToast('🔒 ລັອກປະຫວັດແລ້ວ');
+}
+
+function _getHistory() {
+  try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function _saveHistory(arr) {
+  try { localStorage.setItem(HIST_KEY, JSON.stringify(arr)); } catch {}
+}
+
+function saveOrderToHistory() {
+  const { items, fee, disc, total, qty } = _calcTotals();
+  if (!qty) return;
+  const now   = new Date();
+  const typeLabel = { dine:'🪑 ນັ່ງກິນຢູ່ຮ້ານ', delivery:'🛵 ສົ່ງເຖິງບ້ານ', pickup:'🥡 ຮັບດ້ວຍຕົນເອງ' }[orderType] || orderType;
+  const payLabel  = { cash:'💵 ເງິນສົດ', bcel:'🏦 BCEL One' }[payType] || payType;
+  const entry = {
+    time:    now.toLocaleString('lo-LA'),
+    name:    G('customerName')?.value.trim()    || '-',
+    phone:   G('customerPhone')?.value.trim()   || '',
+    address: G('customerAddress')?.value.trim() || '',
+    type:    typeLabel,
+    pay:     payLabel,
+    items:   items.map(i => ({ id: i.id, name: MENU[i.id].name, q: i.q, sub: i.sub })),
+    fee, disc, total, qty
+  };
+  const hist = _getHistory();
+  hist.unshift(entry);
+  if (hist.length > MAX_HISTORY) hist.length = MAX_HISTORY;
+  _saveHistory(hist);
+  if (_histUnlocked) _renderHistory();
+}
+
+function _renderHistory() {
+  const wrap     = G('historyWrap');
+  const empty    = G('histEmpty');
+  const clearBtn = G('clearHistBtn');
+  if (!wrap) return;
+  wrap.querySelectorAll('.hist-card').forEach(el => el.remove());
+
+  const hist = _getHistory();
+  if (hist.length === 0) {
+    if (empty)    empty.style.display    = '';
+    if (clearBtn) clearBtn.style.display = 'none';
+    return;
+  }
+  if (empty)    empty.style.display    = 'none';
+  if (clearBtn) clearBtn.style.display = '';
+
+  hist.forEach((entry, idx) => {
+    const card = document.createElement('div');
+    card.className = 'hist-card';
+    const itemLines = entry.items.map(i => `${i.name} ×${i.q}  =  ${fmt(i.sub)} ກີບ`).join('<br>');
+    const phone   = entry.phone   ? `<div class="hi-row">📞 ${entry.phone}</div>`   : '';
+    const address = entry.address ? `<div class="hi-row">📍 ${entry.address}</div>` : '';
+    card.innerHTML = `
+      <div class="hist-head">
+        <span class="hist-time">🕐 ${entry.time}</span>
+        <span class="hist-total">${fmt(entry.total)} ກີບ</span>
+      </div>
+      <div class="hi-customer">
+        <div class="hi-row">👤 <strong>${entry.name}</strong></div>
+        ${phone}${address}
+        <div class="hi-row">${entry.type} · ${entry.pay}</div>
+      </div>
+      <div class="hist-items" style="margin-top:6px">${itemLines}</div>
+      ${entry.fee  > 0 ? `<div class="hi-row" style="color:var(--muted);font-size:.74rem">🛵 ຄ່າສົ່ງ ${fmt(entry.fee)} ກີບ</div>` : ''}
+      ${entry.disc > 0 ? `<div class="hi-row" style="color:var(--green-d);font-size:.74rem">🎁 ຫຼຸດ ${fmt(entry.disc)} ກີບ</div>` : ''}
+      <button class="hist-reorder" onclick="reorder(${idx})">🔄 ສັ່ງຄືນ</button>`;
+    wrap.appendChild(card);
+  });
+}
+
+function reorder(idx) {
+  const hist = _getHistory();
+  const entry = hist[idx];
+  if (!entry) return;
+  // Reset all qtys first
+  for (const id in MENU) {
+    G(id).value = 0;
+    const d = G('d-' + id); if (d) d.textContent = '0';
+  }
+  // Apply saved qtys
+  entry.items.forEach(i => {
+    if (G(i.id)) {
+      G(i.id).value = i.q;
+      const d = G('d-' + i.id); if (d) d.textContent = i.q;
+    }
+  });
+  refresh();
+  haptic(50);
+  showToast('🔄 ດຶງລາຍການຄືນແລ້ວ — ກວດສອບກ່ອນສົ່ງ');
+  // scroll to menu
+  G('group-soup')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function clearHistory() {
+  if (!_histUnlocked) return;
+  if (!confirm('ລຶບປະຫວັດທັງໝົດ?')) return;
+  _saveHistory([]);
+  _renderHistory();
+  showToast('🗑 ລຶບປະຫວັດສຳເລັດ');
+}
+
+/* ═══════════════════════════════════════
+   HAPTIC FEEDBACK
+═══════════════════════════════════════ */
+function haptic(ms) {
+  try { if (navigator.vibrate) navigator.vibrate(ms || 20); } catch {}
+}
+
+/* ═══════════════════════════════════════
+   BACK TO TOP
+═══════════════════════════════════════ */
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  haptic(20);
+}
+
+window.addEventListener('scroll', () => {
+  const btn = G('bttBtn');
+  if (!btn) return;
+  btn.classList.toggle('show', window.scrollY > 300);
+}, { passive: true });
+
+/* ═══════════════════════════════════════
+   CART BADGE (on send button)
+═══════════════════════════════════════ */
+function updateCartBadge(qty) {
+  const badge = G('cartBadge');
+  if (!badge) return;
+  if (qty > 0) {
+    badge.textContent = qty > 99 ? '99+' : qty;
+    badge.classList.add('show');
+  } else {
+    badge.classList.remove('show');
+  }
+}
+
+/* ═══════════════════════════════════════
+   MIN ORDER WARN (patch into refresh)
+═══════════════════════════════════════ */
+const _origRefresh = refresh;
+refresh = function() {
+  _origRefresh();
+  // Re-calc qty & subtotal for extra features
+  let qty = 0, subtotal = 0;
+  for (const id in MENU) {
+    const q = getQty(id);
+    qty      += q;
+    subtotal += q * MENU[id].price;
+  }
+  // Min order: 30,000 ກີບ (exclude delivery fee)
+  const MIN_ORDER = 30000;
+  const warn = G('minWarn');
+  if (warn) {
+    if (qty > 0 && subtotal < MIN_ORDER) {
+      warn.classList.add('show');
+    } else {
+      warn.classList.remove('show');
+    }
+  }
+  // Cart badge
+  updateCartBadge(qty);
+};
+
+/* ═══════════════════════════════════════
+   PATCH sendOrder → save to history
+═══════════════════════════════════════ */
+const _origSend = sendOrder;
+sendOrder = function() {
+  const { qty } = _calcTotals();
+  if (!qty) { showToast('⚠️ ກະລຸນາເລືອກເມນູຢ່າງໜ້ອຍ 1 ລາຍການ'); return; }
+  // If delivery — show pin modal first; otherwise send directly
+  if (orderType === 'delivery') {
+    openPinModal();
+  } else {
+    saveOrderToHistory();
+    haptic(40);
+    _origSend();
+  }
+};
+
+/* ═══════════════════════════════════════
+   PIN LOCATION
+═══════════════════════════════════════ */
+let _pinLat = null, _pinLng = null;
+
+/* ── PIN FIELD (inline in form) ── */
+function pinFieldGetLocation() {
+  if (!navigator.geolocation) {
+    _pinFieldSetStatus('error', '❌', 'ບຣາວເຊີບໍ່ຮອງຮັບ GPS');
+    return;
+  }
+  const btn = G('pinFieldBtn');
+  if (btn) {
+    btn.classList.add('loading');
+    G('pinFieldIcon').textContent = '⏳';
+    G('pinFieldLabel').textContent = 'ກຳລັງດຶງຕຳແໜ່ງ GPS...';
+    G('pinFieldSub').textContent = 'ກະລຸນາລໍຖ້າສັກຄູ່';
+    G('pinFieldArrow').style.display = 'none';
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      _pinLat = pos.coords.latitude;
+      _pinLng = pos.coords.longitude;
+      const acc = Math.round(pos.coords.accuracy);
+      const mapsUrl = `https://maps.google.com/?q=${_pinLat},${_pinLng}`;
+
+      // Fill address field with maps link
+      const addrEl = G('customerAddress');
+      if (addrEl && !addrEl.value.trim()) {
+        addrEl.value = mapsUrl;
+      }
+
+      if (btn) {
+        btn.classList.remove('loading');
+        btn.classList.add('done');
+        G('pinFieldIcon').textContent = '✅';
+        G('pinFieldLabel').textContent = 'ດຶງຕຳແໜ່ງສຳເລັດແລ້ວ — ກົດເພື່ອດຶງໃໝ່';
+        G('pinFieldSub').textContent = `ຄວາມຖືກຕ້ອງ ±${acc} ແມັດ`;
+        G('pinFieldArrow').style.display = '';
+      }
+
+      _pinFieldSetStatus('ok', '📍',
+        'ຕຳແໜ່ງຂອງທ່ານຖືກດຶງສຳເລັດ',
+        `${_pinLat.toFixed(5)}, ${_pinLng.toFixed(5)}  ·  ${mapsUrl}`);
+
+      haptic(30);
+      showToast('📍 ດຶງຕຳແໜ່ງຂອງທ່ານສຳເລັດແລ້ວ!');
+    },
+    err => {
+      const msgs = {
+        1: 'ທ່ານຍັງບໍ່ທັນອະນຸຍາດໃຫ້ໃຊ້ Location — ກະລຸນາໄປອະນຸຍາດໃນການຕັ້ງຄ່າ Browser ກ່ອນ',
+        2: 'ຫາຕຳແໜ່ງ GPS ບໍ່ໄດ້ — ກວດສອບສັນຍານ ຫຼື ລອງໃໝ່ອີກຄັ້ງ',
+        3: 'ໃຊ້ເວລາດຶງ GPS ດົນເກີນໄປ — ກະລຸນາລອງໃໝ່ອີກຄັ້ງ',
+      };
+      _pinFieldSetStatus('error', '❌', msgs[err.code] || 'ດຶງຕຳແໜ່ງ GPS ບໍ່ສຳເລັດ — ກະລຸນາລອງໃໝ່');
+      if (btn) {
+        btn.classList.remove('loading');
+        G('pinFieldIcon').textContent = '🎯';
+        G('pinFieldLabel').textContent = 'ກົດທີ່ນີ້ເພື່ອລອງໃໝ່';
+        G('pinFieldSub').textContent = msgs[err.code] || 'ດຶງຕຳແໜ່ງບໍ່ສຳເລັດ';
+        G('pinFieldArrow').style.display = '';
+      }
+    },
+    { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+  );
+}
+
+function _pinFieldSetStatus(type, icon, text, coords) {
+  const box = G('pinFieldStatus');
+  if (!box) return;
+  box.style.display = 'flex';
+  box.className = 'pin-field-status' + (type === 'error' ? ' error' : '');
+  G('pinFieldStatusIcon').textContent = icon;
+  G('pinFieldStatusText').textContent = text;
+  const coordEl = G('pinFieldCoords');
+  if (coordEl) coordEl.textContent = coords || '';
+}
+
+function pinFieldClear() {
+  _pinLat = null; _pinLng = null;
+  const box = G('pinFieldStatus');
+  if (box) box.style.display = 'none';
+  const btn = G('pinFieldBtn');
+  if (btn) {
+    btn.classList.remove('done', 'loading');
+    G('pinFieldIcon').textContent = '🎯';
+    G('pinFieldLabel').textContent = 'ກົດທີ່ນີ້ເພື່ອປັກໝຸດຕຳແໜ່ງຂອງຂ້ອຍ';
+    G('pinFieldSub').textContent = 'ລະບົບຈະດຶງ GPS ຂອງໂທລະສັບທ່ານອັດຕະໂນມັດ';
+    G('pinFieldArrow').style.display = '';
+  }
+  // Clear address if it was auto-filled with maps link
+  const addrEl = G('customerAddress');
+  if (addrEl && addrEl.value.startsWith('https://maps.google.com')) {
+    addrEl.value = '';
+  }
+  showToast('🗑 ລຶບຕຳແໜ່ງແລ້ວ');
+}
+
+function openPinModal() {
+  // Reset state
+  _pinLat = null; _pinLng = null;
+  const sendBtn = G('pinSendBtn');
+  if (sendBtn) sendBtn.disabled = true;
+
+  const st = G('pinStatus');
+  if (st) {
+    st.className = 'pin-status';
+    G('pinStatusText').textContent = 'ກົດ "ຫາຕຳແໜ່ງຂອງຂ້ອຍ" ເພື່ອແຊຣ໌ Location';
+    G('pinCoords').textContent = '';
+  }
+  const frame = G('pinMapFrame');
+  const ph    = G('pinMapPlaceholder');
+  if (frame) frame.style.display = 'none';
+  if (ph)    ph.style.display    = '';
+
+  // Pre-fill address note if user typed something
+  const addrInput = G('customerAddress');
+  const noteField = G('pinAddrNote');
+  if (noteField && addrInput && addrInput.value.trim()) {
+    noteField.value = addrInput.value.trim();
+  }
+
+  G('pinModalOv').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePinModal() {
+  G('pinModalOv').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handlePinOvClick(e) {
+  if (e.target === G('pinModalOv')) closePinModal();
+}
+
+function pinGetLocation() {
+  if (!navigator.geolocation) {
+    _pinSetStatus('error', '❌', 'ບຣາວເຊີບໍ່ຮອງຮັບ GPS — ກະລຸນາໃສ່ທີ່ຢູ່ດ້ວຍຕົນເອງ');
+    return;
+  }
+  const btn = G('pinLocateBtn');
+  if (btn) { btn.textContent = '⏳ ກຳລັງຫາຕຳແໜ່ງ...'; btn.disabled = true; }
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      _pinLat = pos.coords.latitude;
+      _pinLng = pos.coords.longitude;
+      const acc = Math.round(pos.coords.accuracy);
+
+      _pinSetStatus('success', '✅',
+        `ພົບຕຳແໜ່ງສຳເລັດ (ຄວາມຖືກຕ້ອງ ±${acc}m)`,
+        `${_pinLat.toFixed(6)}, ${_pinLng.toFixed(6)}`);
+
+      // Show map
+      const frame = G('pinMapFrame');
+      const ph    = G('pinMapPlaceholder');
+      if (frame) {
+        frame.src = `https://maps.google.com/maps?q=${_pinLat},${_pinLng}&z=17&output=embed`;
+        frame.style.display = '';
+        if (ph) ph.style.display = 'none';
+      }
+
+      const sendBtn = G('pinSendBtn');
+      if (sendBtn) sendBtn.disabled = false;
+      if (btn) { btn.textContent = '🔄 ຫາຕຳແໜ່ງໃໝ່'; btn.disabled = false; }
+      haptic(30);
+      showToast('📍 ພົບຕຳແໜ່ງຂອງທ່ານແລ້ວ!');
+    },
+    err => {
+      const msgs = {
+        1: 'ທ່ານຍັງບໍ່ທັນອະນຸຍາດໃຫ້ໃຊ້ Location — ກະລຸນາໄປອະນຸຍາດໃນການຕັ້ງຄ່າ Browser ກ່ອນ',
+        2: 'ຫາຕຳແໜ່ງ GPS ບໍ່ໄດ້ — ກວດສອບສັນຍານ ຫຼື ລອງໃໝ່ອີກຄັ້ງ',
+        3: 'ໃຊ້ເວລາດຶງ GPS ດົນເກີນໄປ — ກະລຸນາລອງໃໝ່ອີກຄັ້ງ',
+      };
+      _pinSetStatus('error', '❌', msgs[err.code] || 'ດຶງຕຳແໜ່ງ GPS ບໍ່ສຳເລັດ — ກະລຸນາລອງໃໝ່');
+      if (btn) { btn.textContent = '🎯 ກົດທີ່ນີ້ເພື່ອລອງໃໝ່'; btn.disabled = false; }
+    },
+    { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+  );
+}
+
+function _pinSetStatus(type, icon, text, coords) {
+  const st = G('pinStatus');
+  if (!st) return;
+  st.className = 'pin-status' + (type ? ' ' + type : '');
+  G('pinStatusText').textContent = text;
+  G('pinCoords').textContent = coords || '';
+  st.querySelector('.ps-icon').textContent = icon;
+}
+
+function pinConfirmAndSend() {
+  closePinModal();
+  // Inject coords into address field for the WhatsApp message
+  if (_pinLat !== null && _pinLng !== null) {
+    const note   = (G('pinAddrNote')?.value || '').trim();
+    const mapsUrl = `https://maps.google.com/?q=${_pinLat},${_pinLng}`;
+    const addrFull = note
+      ? `${note}\n📍 ${mapsUrl}`
+      : `📍 ${mapsUrl}`;
+    // Store for sendOrder to pick up
+    _pinLocationStr = addrFull;
+  } else {
+    const note = (G('pinAddrNote')?.value || '').trim();
+    _pinLocationStr = note || null;
+  }
+  saveOrderToHistory();
+  haptic(40);
+  _sendOrderWithPin();
+}
+
+function pinSkipAndSend() {
+  closePinModal();
+  _pinLocationStr = null;
+  saveOrderToHistory();
+  haptic(40);
+  _origSend();
+}
+
+let _pinLocationStr = null;
+
+function _sendOrderWithPin() {
+  const { items, fee, disc, total, qty } = _calcTotals();
+  if (!qty) return;
+
+  const name    = G('customerName').value.trim()   || '-';
+  const phone   = G('customerPhone')?.value.trim() || '';
+  const address = _pinLocationStr || G('customerAddress')?.value.trim() || '';
+  const special = G('specialReq').value.trim();
+
+  const typeLabel = { dine:'🪑 ນັ່ງກິນຢູ່ຮ້ານ', delivery:'🛵 ສົ່ງເຖິງບ້ານ', pickup:'🥡 ຮັບດ້ວຍຕົນເອງ' }[orderType];
+  const payLabel  = { cash:'💵 ເງິນສົດ', bcel:'🏦 BCEL One' }[payType];
+
+  const now  = new Date();
+  const time = now.toLocaleTimeString('lo-LA', { hour:'2-digit', minute:'2-digit' });
+  const date = now.toLocaleDateString('lo-LA');
+
+  const lines = [
+`╔══════════════════════╗
+   📋 ອໍເດີໃໝ່  ⏰ ${time}  📅 ${date}
+╚══════════════════════╝`,
+`${typeLabel}  |  ${payLabel}`,
+`👤 ຊື່ / ໂຕະ : ${name}`,
+phone   ? `📞 ໂທ      : ${phone}`   : null,
+address ? `📍 ທີ່ຢູ່   :\n${address}` : null,
+`──────────────────────`,
+...items.map(i => {
+  let l = `${MENU[i.id].name} × ${i.q}  =  ${fmt(i.sub)} ກີບ`;
+  if (i.note) l += `\n   📝 ${i.note}`;
+  return l;
+}),
+`──────────────────────`,
+fee  > 0 ? `🛵 ຄ່າສົ່ງ       : ${fmt(fee)} ກີບ` : null,
+disc > 0 ? `🎁 ສ່ວນຫຼຸດ ${promoDisc}%  : - ${fmt(disc)} ກີບ` : null,
+`📦 ລວມ           : ${qty} ລາຍການ`,
+`💰 ທັງໝົດ       : ${fmt(total)} ກີບ`,
+special ? `\n💬 ຄຳຮ້ອງ: ${special}` : null,
+  ].filter(Boolean).join('\n');
+
+  const encoded = encodeURIComponent(lines);
+  const deepLink = `whatsapp://send?phone=${WA_PHONE}&text=${encoded}`;
+  const webLink  = `https://wa.me/${WA_PHONE}?text=${encoded}`;
+
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (isMobile) {
+    window.location.href = deepLink;
+  } else {
+    const start = Date.now();
+    window.location.href = deepLink;
+    setTimeout(() => {
+      if (Date.now() - start < 2000) {
+        window.open(webLink, '_blank');
+      }
+    }, 1500);
+  }
+  _pinLocationStr = null;
+}
+
+/* Hero cover food image */
+function initHeroCover(){
+  const img=G('heroFood');
+  if(img && !img.getAttribute('src') && typeof getMenuImage==='function'){
+    img.src=getMenuImage('nl22') || getMenuImage('nd1') || '';
+  }
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initHeroCover); else initHeroCover();
+
+/* ═══════════════════════════════════════
+   PATCH changeQty → haptic
+═══════════════════════════════════════ */
+const _origChangeQty = changeQty;
+changeQty = function(id, delta) {
+  haptic(15);
+  _origChangeQty(id, delta);
+};
+</script>
+</body>
+</html>
